@@ -11,6 +11,14 @@ namespace Condominiums.Api.Services;
 /// </summary>
 public interface IResidentService
 {
+
+    /// <summary>
+    /// Allows to delete a resident by Id.
+    /// </summary>
+    /// <param name="id">The resident's Id.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> DeleteAsync(string id);
+
     /// <summary>
     /// Allows to create a resident.
     /// </summary>
@@ -79,6 +87,41 @@ public class ResidentService : IResidentService
         catch (Exception ex)
         {
             errorMessage = "Error saving the resident.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult> DeleteAsync(string id)
+    {
+        _logger.LogDebug("Attempting to delete a resident.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(id))
+        {
+            errorMessage = "The 'id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            Resident? resident = await _residentStore.GetByIdAsync(id);
+
+            if (resident == null)
+            {
+                errorMessage = "Resident not found.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            await _residentStore.DeleteOneAsync(id);
+            _logger.LogInformation($"Resident '{resident.Name}' deleted.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error deleting the resident.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage };
         }

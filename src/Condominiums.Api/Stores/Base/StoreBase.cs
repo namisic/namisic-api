@@ -31,4 +31,10 @@ public class StoreBase<TCollection> : IStore<TCollection>
     }
 
     public Task InsertOneAsync(TCollection document) => _collection.InsertOneAsync(document);
+    public Task DeleteOneAsync(string id)
+    {
+        ObjectId objectId = ObjectId.Parse(id);
+        FilterDefinition<TCollection> filter = Builders<TCollection>.Filter.Eq(r => r.Id, objectId);
+        return _collection.DeleteOneAsync(filter);
+    }
 }

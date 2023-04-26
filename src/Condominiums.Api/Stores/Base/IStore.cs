@@ -18,4 +18,11 @@ public interface IStore<TCollection> where TCollection : IHasId
     /// </summary>
     /// <param name="document">The entity type.</param>
     Task InsertOneAsync(TCollection document);
+
+    /// <summary>
+    /// Allows to delete a document of entity type by Id.
+    /// </summary>
+    /// <param name="id">The entity Id</param>
+    /// <returns>Task result.</returns>
+    Task DeleteOneAsync(string id);
 }

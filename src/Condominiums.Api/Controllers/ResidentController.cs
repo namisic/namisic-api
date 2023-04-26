@@ -20,9 +20,24 @@ public class ResidentController : ControllerBase
     }
 
     /// <summary>
+    /// Allows to delete a Resident by Id.
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        ServiceResult result = await _residentService.DeleteAsync(id);
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
     /// Allows to search a Resident by Id.
     /// </summary>
     [ProducesResponseType(typeof(ResidentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet("{id}")]
