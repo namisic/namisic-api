@@ -29,5 +29,6 @@ public class StoreBase<TCollection> : IStore<TCollection>
         FilterDefinition<TCollection> filter = Builders<TCollection>.Filter.Eq(r => r.Id, objectId);
         return _collection.Find(filter).FirstOrDefaultAsync();
     }
+
     public Task InsertOneAsync(TCollection document) => _collection.InsertOneAsync(document);
 }

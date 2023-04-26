@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Condominiums.Api.Controllers;
 
+/// <summary>
+/// Endpoints that allows to manage Residents.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class ResidentController : ControllerBase
@@ -16,6 +19,9 @@ public class ResidentController : ControllerBase
         _residentService = residentService;
     }
 
+    /// <summary>
+    /// Allows to create a new Resident.
+    /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

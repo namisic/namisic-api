@@ -6,6 +6,9 @@ using Condominiums.Api.Stores;
 
 namespace Condominiums.Api.Services;
 
+/// <summary>
+/// Defines the methods that allows to manage Residents.
+/// </summary>
 public interface IResidentService
 {
     /// <summary>
@@ -16,6 +19,9 @@ public interface IResidentService
     Task<ServiceResult> CreateAsync(CreateResidentDto createResidentDto);
 }
 
+/// <summary>
+/// Implements the methods that allows to manage Residents.
+/// </summary>
 public class ResidentService : IResidentService
 {
     private readonly ILogger<ResidentService> _logger;
