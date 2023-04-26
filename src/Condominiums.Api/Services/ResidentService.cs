@@ -24,6 +24,14 @@ public interface IResidentService
     /// <param name="id">The resident's Id.</param>
     /// <returns>Execution result with Resident information in Extra property if found.</returns>
     Task<ServiceResult<ResidentDto>> GetAsync(string id);
+
+    /// <summary>
+    /// Allows to update a resident.
+    /// </summary>
+    /// <param name="id">The resident's Id.</param>
+    /// <param name="updateResidentDto">The resident's information to update.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> UpdateAsync(string id, UpdateResidentDto updateResidentDto);
 }
 
 /// <summary>
@@ -108,6 +116,57 @@ public class ResidentService : IResidentService
             errorMessage = "Error searching the resident.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult<ResidentDto>() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult> UpdateAsync(string id, UpdateResidentDto updateResidentDto)
+    {
+        _logger.LogDebug("Attempting to update a resident.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(id))
+        {
+            errorMessage = "The 'id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        if (string.IsNullOrEmpty(updateResidentDto.ApartmentNumber))
+        {
+            errorMessage = "The 'apartment number' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        if (string.IsNullOrEmpty(updateResidentDto.Name))
+        {
+            errorMessage = "The 'name' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            Resident? resident = await _residentStore.GetByIdAsync(id);
+
+            if (resident == null)
+            {
+                errorMessage = "Resident not found.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            resident.ApartmentNumber = updateResidentDto.ApartmentNumber;
+            resident.Name = updateResidentDto.Name;
+            await _residentStore.UpdateOneAsync(resident);
+            _logger.LogInformation($"Resident '{resident.Name}' updated.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error updating the resident.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
         }
     }
 }

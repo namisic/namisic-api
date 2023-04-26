@@ -18,14 +18,13 @@ public static class ControllerExtensions
 
         if (serviceResult.Success)
         {
-            object? objectValue = null;
-
             if (serviceResultType.IsGenericType)
             {
-                objectValue = serviceResultType.GetProperty("Extra")?.GetValue(serviceResult);
+                object? objectValue = serviceResultType.GetProperty("Extra")?.GetValue(serviceResult);
+                return controller.Ok(objectValue);
             }
 
-            return controller.Ok(objectValue);
+            return controller.Ok();
         }
 
         return controller.Problem(serviceResult.ErrorMessage, statusCode: serviceResult.HttpStatusCode);

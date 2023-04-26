@@ -44,4 +44,18 @@ public class ResidentController : ControllerBase
         ServiceResult result = await _residentService.CreateAsync(newResident);
         return this.ActionResultByServiceResult(result);
     }
+
+    /// <summary>
+    /// Allows to update a Resident.
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(string id, UpdateResidentDto residentToUpdate)
+    {
+        ServiceResult result = await _residentService.UpdateAsync(id, residentToUpdate);
+        return this.ActionResultByServiceResult(result);
+    }
 }

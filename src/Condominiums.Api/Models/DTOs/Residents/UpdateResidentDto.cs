@@ -1,15 +1,10 @@
 namespace Condominiums.Api.Models.DTOs.Residents;
 
 /// <summary>
-/// Represents the information of a resident when is queried.
+/// Represents the information needed to update a resident.
 /// </summary>
-public class ResidentDto
+public class UpdateResidentDto
 {
-    /// <summary>
-    /// The resident's identifier.
-    /// </summary>
-    public string Id { get; set; } = String.Empty;
-
     /// <summary>
     /// The resident's name.
     /// </summary>
