@@ -1,7 +1,7 @@
-using Condominiums.Api.Models.Entities;
-using Condominiums.Api.Stores;
+using Condominiums.Api.Models.DTOs.Residents;
+using Condominiums.Api.Services;
+using Condominiums.Api.Services.Base;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace Condominiums.Api.Controllers;
 
@@ -9,17 +9,20 @@ namespace Condominiums.Api.Controllers;
 [Route("api/[controller]")]
 public class ResidentController : ControllerBase
 {
-    private readonly IResidentStore _residentStore;
+    private readonly IResidentService _residentService;
 
-    public ResidentController(IResidentStore residentStore)
+    public ResidentController(IResidentService residentService)
     {
-        _residentStore = residentStore;
+        _residentService = residentService;
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
-    public async Task Post(Resident newResident)
+    public async Task<IActionResult> Post(CreateResidentDto newResident)
     {
-        newResident.Id = ObjectId.GenerateNewId();
-        await _residentStore.InsertOneAsync(newResident);
+        ServiceResult result = await _residentService.CreateAsync(newResident);
+        return this.ActionResultByServiceResult(result);
     }
 }

@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-string connectionString = builder.Configuration.GetConnectionString("MongoDbUri");
+string? connectionString = builder.Configuration.GetConnectionString("MongoDbUri");
 string? mongoDbname = builder.Configuration.GetValue<string>("MongoDbName");
 
 builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(connectionString));

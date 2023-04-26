@@ -1,3 +1,4 @@
+using Condominiums.Api.Stores.Base;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -6,7 +7,7 @@ namespace Condominiums.Api.Models.Entities;
 /// <summary>
 /// Represent the information stored from a resident.
 /// </summary>
-public class Resident
+public class Resident : IHasId
 {
     /// <summary>
     /// The resident's identifier.
@@ -16,7 +17,7 @@ public class Resident
     /// <summary>
     /// The resident's name.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = String.Empty;
 
     /// <summary>
     /// House or apartment number where the resident lives.

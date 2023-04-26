@@ -1,19 +1,17 @@
-using MongoDB.Bson;
-
 namespace Condominiums.Api.Stores.Base;
 
 /// <summary>
 /// Defines the general methods to perform the storage of an entity.
 /// </summary>
 /// <typeparam name="TCollection">The entity type.</typeparam>
-public interface IStore<TCollection>
+public interface IStore<TCollection> where TCollection : IHasId
 {
     /// <summary>
     /// Allows to get a document of entity type by Id.
     /// </summary>
     /// <param name="id">The entity Id</param>
     /// <returns>The document of entity type.</returns>
-    Task<TCollection?> GetByIdAsync(ObjectId id);
+    Task<TCollection?> GetByIdAsync(string id);
 
     /// <summary>
     /// Allows to insert one document of entity type.
