@@ -17,6 +17,13 @@ public interface IResidentService
     /// <param name="createResidentDto">The resident's information.</param>
     /// <returns>Execution result.</returns>
     Task<ServiceResult> CreateAsync(CreateResidentDto createResidentDto);
+
+    /// <summary>
+    /// Allows to get a resident by Id.
+    /// </summary>
+    /// <param name="id">The resident's Id.</param>
+    /// <returns>Execution result with Resident information in Extra property if found.</returns>
+    Task<ServiceResult<ResidentDto>> GetAsync(string id);
 }
 
 /// <summary>
@@ -66,6 +73,41 @@ public class ResidentService : IResidentService
             errorMessage = "Error saving the resident.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult<ResidentDto>> GetAsync(string id)
+    {
+        _logger.LogDebug("Attempting to get a resident.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(id))
+        {
+            errorMessage = "The 'id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult<ResidentDto>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            Resident? resident = await _residentStore.GetByIdAsync(id);
+
+            if (resident == null)
+            {
+                errorMessage = "Resident not found.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult<ResidentDto>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            ResidentDto residentDto = _mapper.Map<ResidentDto>(resident);
+            _logger.LogInformation($"Resident '{residentDto.Name}' found.");
+            return new ServiceResult<ResidentDto>() { Extra = residentDto };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error searching the resident.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<ResidentDto>() { ErrorMessage = errorMessage };
         }
     }
 }

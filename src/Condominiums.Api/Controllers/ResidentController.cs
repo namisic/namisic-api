@@ -20,6 +20,19 @@ public class ResidentController : ControllerBase
     }
 
     /// <summary>
+    /// Allows to search a Resident by Id.
+    /// </summary>
+    [ProducesResponseType(typeof(ResidentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(string id)
+    {
+        ServiceResult result = await _residentService.GetAsync(id);
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
     /// Allows to create a new Resident.
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]

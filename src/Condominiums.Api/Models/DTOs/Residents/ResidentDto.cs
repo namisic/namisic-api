@@ -1,28 +1,24 @@
-using Condominiums.Api.Stores.Base;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
-namespace Condominiums.Api.Models.Entities;
+namespace Condominiums.Api.Models.DTOs.Residents;
 
 /// <summary>
-/// Represents the information stored from a resident.
+/// Represents the information of a resident when is queried.
 /// </summary>
-public class Resident : IHasId
+public class ResidentDto
 {
     /// <summary>
     /// The resident's identifier.
     /// </summary>
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
 
     /// <summary>
     /// The resident's name.
     /// </summary>
-    [BsonElement("name")]
     public string Name { get; set; } = String.Empty;
 
     /// <summary>
     /// House or apartment number where the resident lives.
     /// </summary>
-    [BsonElement("apartment_number")]
     public string ApartmentNumber { get; set; } = String.Empty;
 }
