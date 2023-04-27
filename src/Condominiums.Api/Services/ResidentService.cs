@@ -3,6 +3,7 @@ using Condominiums.Api.Models.DTOs.Residents;
 using Condominiums.Api.Models.Entities;
 using Condominiums.Api.Services.Base;
 using Condominiums.Api.Stores;
+using MongoDB.Driver;
 
 namespace Condominiums.Api.Services;
 
@@ -25,6 +26,12 @@ public interface IResidentService
     /// <param name="createResidentDto">The resident's information.</param>
     /// <returns>Execution result.</returns>
     Task<ServiceResult> CreateAsync(CreateResidentDto createResidentDto);
+
+    /// <summary>
+    /// Allows to get a list with all the residents.
+    /// </summary>
+    /// <returns>Execution result with Resident information in Extra property if found.</returns>
+    Task<ServiceResult<List<ResidentDto>>> GetAsync();
 
     /// <summary>
     /// Allows to get a resident by Id.
@@ -159,6 +166,29 @@ public class ResidentService : IResidentService
             errorMessage = "Error searching the resident.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult<ResidentDto>() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult<List<ResidentDto>>> GetAsync()
+    {
+        _logger.LogDebug("Attempting to get all the residents.");
+        string? errorMessage = null;
+
+        try
+        {
+            SortDefinition<Resident> sort = Builders<Resident>.Sort
+                .Ascending(r => r.ApartmentNumber)
+                .Ascending(r => r.Name);
+            List<Resident> residents = await _residentStore.GetAllAsync(sort);
+            List<ResidentDto> residentsDto = _mapper.Map<List<ResidentDto>>(residents);
+            _logger.LogInformation($"All residents getted.");
+            return new ServiceResult<List<ResidentDto>>() { Extra = residentsDto };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error getting residents.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<List<ResidentDto>>() { ErrorMessage = errorMessage };
         }
     }
 

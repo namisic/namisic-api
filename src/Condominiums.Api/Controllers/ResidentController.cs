@@ -34,6 +34,18 @@ public class ResidentController : ControllerBase
     }
 
     /// <summary>
+    /// Allows to get all Residents.
+    /// </summary>
+    [ProducesResponseType(typeof(List<ResidentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        ServiceResult<List<ResidentDto>> result = await _residentService.GetAsync();
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
     /// Allows to search a Resident by Id.
     /// </summary>
     [ProducesResponseType(typeof(ResidentDto), StatusCodes.Status200OK)]

@@ -1,3 +1,5 @@
+using MongoDB.Driver;
+
 namespace Condominiums.Api.Stores.Base;
 
 /// <summary>
@@ -6,6 +8,13 @@ namespace Condominiums.Api.Stores.Base;
 /// <typeparam name="TCollection">The entity type.</typeparam>
 public interface IStore<TCollection> where TCollection : IHasId
 {
+    /// <summary>
+    /// Allows to get all documents of entity type.
+    /// </summary>
+    /// <param name="id">The entity Id</param>
+    /// <returns>The document of entity type.</returns>
+    Task<List<TCollection>> GetAllAsync(SortDefinition<TCollection>? sort = null);
+
     /// <summary>
     /// Allows to get a document of entity type by Id.
     /// </summary>

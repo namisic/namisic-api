@@ -37,4 +37,17 @@ public class StoreBase<TCollection> : IStore<TCollection>
         FilterDefinition<TCollection> filter = Builders<TCollection>.Filter.Eq(r => r.Id, objectId);
         return _collection.DeleteOneAsync(filter);
     }
+
+    public Task<List<TCollection>> GetAllAsync(SortDefinition<TCollection>? sort = null)
+    {
+        FilterDefinition<TCollection> filter = Builders<TCollection>.Filter.Empty;
+        IFindFluent<TCollection, TCollection> find = _collection.Find(filter);
+
+        if (sort != null)
+        {
+            find.Sort(sort);
+        }
+
+        return find.ToListAsync();
+    }
 }
