@@ -10,11 +10,11 @@ namespace Condominiums.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class ResidentController : ControllerBase
+public class ResidentsController : ControllerBase
 {
     private readonly IResidentService _residentService;
 
-    public ResidentController(IResidentService residentService)
+    public ResidentsController(IResidentService residentService)
     {
         _residentService = residentService;
     }
