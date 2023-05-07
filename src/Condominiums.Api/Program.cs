@@ -10,7 +10,9 @@ string[]? allowedCorsOrigins = builder.Configuration.GetSection("AllowedCorsOrig
 
 builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(connectionString));
 builder.Services.AddScoped<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDbname));
-builder.Services.AddCors(options => options.AddDefaultPolicy(config => config.WithOrigins(allowedCorsOrigins!)));
+builder.Services.AddCors(options => options.AddDefaultPolicy(
+    config => config.AllowAnyMethod().WithOrigins(allowedCorsOrigins!)
+));
 builder.Services.AddApi();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
