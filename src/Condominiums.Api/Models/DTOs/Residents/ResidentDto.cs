@@ -1,7 +1,7 @@
 namespace Condominiums.Api.Models.DTOs.Residents;
 
 /// <summary>
-/// Represents the information of a resident when is queried.
+/// Represents the information of a resident when it is queried.
 /// </summary>
 public class ResidentDto
 {

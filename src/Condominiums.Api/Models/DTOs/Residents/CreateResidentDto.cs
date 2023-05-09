@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Condominiums.Api.Models.DTOs.Residents;
 
 /// <summary>
-/// Information neeeded to create a resident.
+/// Information needed to create a resident.
 /// </summary>
 public class CreateResidentDto
 {

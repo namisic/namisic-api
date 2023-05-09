@@ -1,5 +1,6 @@
 using AutoMapper;
 using Condominiums.Api.Models.DTOs.Residents;
+using Condominiums.Api.Models.DTOs.Vehicles;
 using Condominiums.Api.Models.Entities;
 using Condominiums.Api.Services.Base;
 using Condominiums.Api.Stores;
@@ -12,6 +13,7 @@ namespace Condominiums.Api.Services;
 /// </summary>
 public interface IResidentService
 {
+    #region Resident operations
 
     /// <summary>
     /// Allows to delete a resident by Id.
@@ -41,18 +43,38 @@ public interface IResidentService
     Task<ServiceResult<ResidentDto>> GetAsync(string id);
 
     /// <summary>
+    /// Allows to check if a document exists by Id.
+    /// </summary>
+    /// <param name="id">The entity Id</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> ExistsByIdAsync(string id);
+
+    /// <summary>
     /// Allows to update a resident.
     /// </summary>
     /// <param name="id">The resident's Id.</param>
     /// <param name="updateResidentDto">The resident's information to update.</param>
     /// <returns>Execution result.</returns>
     Task<ServiceResult> UpdateAsync(string id, UpdateResidentDto updateResidentDto);
+
+    #endregion
+
+    #region Vehicles operations
+
+    /// <summary>
+    /// Allows to create a vehicle.
+    /// </summary>
+    /// <param name="createVehicleDto">Vehicle information.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> AddVehicleAsync(CreateVehicleDto createVehicleDto);
+
+    #endregion
 }
 
 /// <summary>
 /// Implements the methods that allows to manage Residents.
 /// </summary>
-public class ResidentService : IResidentService
+public partial class ResidentService : IResidentService
 {
     private readonly ILogger<ResidentService> _logger;
     private readonly IMapper _mapper;
@@ -64,6 +86,8 @@ public class ResidentService : IResidentService
         _mapper = mapper;
         _residentStore = residentStore;
     }
+
+    #region Resident operations
 
     public async Task<ServiceResult> CreateAsync(CreateResidentDto createResidentDto)
     {
@@ -192,6 +216,40 @@ public class ResidentService : IResidentService
         }
     }
 
+    public async Task<ServiceResult> ExistsByIdAsync(string id)
+    {
+        _logger.LogDebug("Attempting to check if resident exists by Id.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(id))
+        {
+            errorMessage = "The 'id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            bool exists = await _residentStore.ExistsByIdAsync(id);
+
+            if (!exists)
+            {
+                errorMessage = "Resident not found.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            _logger.LogInformation("Resident found.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error searching the resident.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<ResidentDto>() { ErrorMessage = errorMessage };
+        }
+    }
+
     public async Task<ServiceResult> UpdateAsync(string id, UpdateResidentDto updateResidentDto)
     {
         _logger.LogDebug("Attempting to update a resident.");
@@ -242,4 +300,55 @@ public class ResidentService : IResidentService
             return new ServiceResult() { ErrorMessage = errorMessage };
         }
     }
+
+    #endregion
+
+    #region Vehicles operations
+
+    public async Task<ServiceResult> AddVehicleAsync(CreateVehicleDto createVehicleDto)
+    {
+        _logger.LogDebug("Attempting to create a vehicle.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(createVehicleDto.ResidentId))
+        {
+            errorMessage = "The 'Resident Id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        if (string.IsNullOrEmpty(createVehicleDto.Type))
+        {
+            errorMessage = "The 'Type' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        if (string.IsNullOrEmpty(createVehicleDto.PlateNumber))
+        {
+            errorMessage = "The 'Plate Number' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            ServiceResult residentExists = await ExistsByIdAsync(createVehicleDto.ResidentId);
+
+            if (!residentExists.Success) return residentExists;
+
+            Vehicle resident = _mapper.Map<Vehicle>(createVehicleDto);
+            await _residentStore.AddVehicleAsync(createVehicleDto.ResidentId, resident);
+            _logger.LogInformation($"The resident '{createVehicleDto.PlateNumber}' was created.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error saving the vehicle.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    #endregion
 }

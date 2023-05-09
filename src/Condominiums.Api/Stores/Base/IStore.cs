@@ -23,6 +23,13 @@ public interface IStore<TCollection> where TCollection : IHasId
     Task<TCollection?> GetByIdAsync(string id);
 
     /// <summary>
+    /// Allows to check if a document exists by Id.
+    /// </summary>
+    /// <param name="id">The entity Id</param>
+    /// <returns><see langword="true"/> when exists, otherwise <see langword="false"/>.</returns>
+    Task<bool> ExistsByIdAsync(string id);
+
+    /// <summary>
     /// Allows to insert one document of entity type.
     /// </summary>
     /// <param name="document">The entity type.</param>
