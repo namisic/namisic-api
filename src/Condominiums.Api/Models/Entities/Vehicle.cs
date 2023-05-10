@@ -7,14 +7,8 @@ namespace Condominiums.Api.Models.Entities;
 /// <summary>
 /// Represents the information stored from a vehicle.
 /// </summary>
-public class Vehicle : IHasId
+public class Vehicle
 {
-    /// <summary>
-    /// The vehicle's identifier.
-    /// </summary>
-    [BsonId]
-    public ObjectId Id { get; set; }
-
     /// <summary>
     /// Indicates the type of vehicle. Possible values are "car" or "motorcycle". Default value is "car".
     /// </summary>

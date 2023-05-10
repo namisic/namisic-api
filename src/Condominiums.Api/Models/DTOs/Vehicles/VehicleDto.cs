@@ -6,11 +6,6 @@ namespace Condominiums.Api.Models.DTOs.Vehicles;
 public class VehicleDto
 {
     /// <summary>
-    /// The vehicle's identifier.
-    /// </summary>
-    public string Id { get; set; }
-
-    /// <summary>
     /// Indicates the type of vehicle. Possible values are "car" or "motorcycle". Default value is "car".
     /// </summary>
     public string Type { get; set; } = "car";
