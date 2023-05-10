@@ -31,4 +31,17 @@ public class VehiclesController : ControllerBase
         ServiceResult result = await _residentService.AddVehicleAsync(newVehicle);
         return this.ActionResultByServiceResult(result);
     }
+
+    /// <summary>
+    /// Allows to update a vehicle.
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPut]
+    public async Task<IActionResult> Put(UpdateVechicleDto vehicle)
+    {
+        ServiceResult result = await _residentService.UpdateVehicleAsync(vehicle);
+        return this.ActionResultByServiceResult(result);
+    }
 }

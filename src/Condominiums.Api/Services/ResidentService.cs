@@ -68,6 +68,13 @@ public interface IResidentService
     /// <returns>Execution result.</returns>
     Task<ServiceResult> AddVehicleAsync(CreateVehicleDto createVehicleDto);
 
+    /// <summary>
+    /// Allows to update a vehicle.
+    /// </summary>
+    /// <param name="updateVehicleDto">Vehicle information.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> UpdateVehicleAsync(UpdateVechicleDto updateVehicleDto);
+
     #endregion
 }
 
@@ -337,9 +344,58 @@ public partial class ResidentService : IResidentService
 
             if (!residentExists.Success) return residentExists;
 
-            Vehicle resident = _mapper.Map<Vehicle>(createVehicleDto);
-            await _residentStore.AddVehicleAsync(createVehicleDto.ResidentId, resident);
-            _logger.LogInformation($"The resident '{createVehicleDto.PlateNumber}' was created.");
+            Vehicle vehicle = _mapper.Map<Vehicle>(createVehicleDto);
+            await _residentStore.AddVehicleAsync(createVehicleDto.ResidentId, vehicle);
+            _logger.LogInformation($"The vehicle '{createVehicleDto.PlateNumber}' was created.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error saving the vehicle.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult> UpdateVehicleAsync(UpdateVechicleDto updateVehicleDto)
+    {
+        _logger.LogDebug("Attempting to update a vehicle.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(updateVehicleDto.ResidentId))
+        {
+            errorMessage = "The 'Resident Id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        if (string.IsNullOrEmpty(updateVehicleDto.Type))
+        {
+            errorMessage = "The 'Type' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        if (string.IsNullOrEmpty(updateVehicleDto.PlateNumber))
+        {
+            errorMessage = "The 'Plate Number' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            ServiceResult residentExists = await ExistsByIdAsync(updateVehicleDto.ResidentId);
+
+            if (!residentExists.Success) return residentExists;
+
+            Vehicle vehicle = _mapper.Map<Vehicle>(updateVehicleDto);
+            await _residentStore.UpdateVehicleAsync(
+                updateVehicleDto.ResidentId,
+                updateVehicleDto.InitialPlateNumber,
+                vehicle
+            );
+            _logger.LogInformation($"The vehicle '{updateVehicleDto.PlateNumber}' was updated.");
             return new ServiceResult();
         }
         catch (Exception ex)
