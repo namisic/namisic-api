@@ -25,4 +25,11 @@ public class Resident : IHasId
     /// </summary>
     [BsonElement("apartment_number")]
     public string ApartmentNumber { get; set; } = String.Empty;
+
+    /// <summary>
+    /// Vehicles owned by the resident.
+    /// </summary>
+    [BsonElement("vehicles")]
+    [BsonIgnoreIfNull]
+    public List<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 }
