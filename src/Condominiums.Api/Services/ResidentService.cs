@@ -73,7 +73,14 @@ public interface IResidentService
     /// </summary>
     /// <param name="updateVehicleDto">Vehicle information.</param>
     /// <returns>Execution result.</returns>
-    Task<ServiceResult> UpdateVehicleAsync(UpdateVechicleDto updateVehicleDto);
+    Task<ServiceResult> UpdateVehicleAsync(UpdateVehicleDto updateVehicleDto);
+
+    /// <summary>
+    /// Allows to delete a vehicle.
+    /// </summary>
+    /// <param name="deleteVehicleDto">Vehicle information.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> DeleteVehicleAsync(DeleteVehicleDto deleteVehicleDto);
 
     #endregion
 }
@@ -357,7 +364,7 @@ public partial class ResidentService : IResidentService
         }
     }
 
-    public async Task<ServiceResult> UpdateVehicleAsync(UpdateVechicleDto updateVehicleDto)
+    public async Task<ServiceResult> UpdateVehicleAsync(UpdateVehicleDto updateVehicleDto)
     {
         _logger.LogDebug("Attempting to update a vehicle.");
         string? errorMessage = null;
@@ -400,7 +407,47 @@ public partial class ResidentService : IResidentService
         }
         catch (Exception ex)
         {
-            errorMessage = "Error saving the vehicle.";
+            errorMessage = "Error updating the vehicle.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult> DeleteVehicleAsync(DeleteVehicleDto deleteVehicleDto)
+    {
+        _logger.LogDebug("Attempting to delete a vehicle.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(deleteVehicleDto.ResidentId))
+        {
+            errorMessage = "The 'Resident Id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        if (string.IsNullOrEmpty(deleteVehicleDto.PlateNumber))
+        {
+            errorMessage = "The 'Plate Number' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            ServiceResult residentExists = await ExistsByIdAsync(deleteVehicleDto.ResidentId);
+
+            if (!residentExists.Success) return residentExists;
+
+            await _residentStore.DeleteVehicleAsync(
+                deleteVehicleDto.ResidentId,
+                deleteVehicleDto.PlateNumber
+            );
+            _logger.LogInformation($"The vehicle '{deleteVehicleDto.PlateNumber}' was deleted.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error deleting the vehicle.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage };
         }

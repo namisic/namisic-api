@@ -39,9 +39,22 @@ public class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPut]
-    public async Task<IActionResult> Put(UpdateVechicleDto vehicle)
+    public async Task<IActionResult> Put(UpdateVehicleDto vehicle)
     {
         ServiceResult result = await _residentService.UpdateVehicleAsync(vehicle);
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
+    /// Allows to delete a vehicle.
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpDelete]
+    public async Task<IActionResult> Delete(DeleteVehicleDto vehicle)
+    {
+        ServiceResult result = await _residentService.DeleteVehicleAsync(vehicle);
         return this.ActionResultByServiceResult(result);
     }
 }

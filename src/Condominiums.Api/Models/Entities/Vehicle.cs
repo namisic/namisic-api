@@ -9,6 +9,8 @@ namespace Condominiums.Api.Models.Entities;
 /// </summary>
 public class Vehicle
 {
+    private string _plateNumber = string.Empty;
+
     /// <summary>
     /// Indicates the type of vehicle. Possible values are "car" or "motorcycle". Default value is "car".
     /// </summary>
@@ -19,5 +21,5 @@ public class Vehicle
     /// Indicates the license plate number of the vehicle.
     /// </summary>
     [BsonElement("plate_number")]
-    public string PlateNumber { get; set; } = string.Empty;
+    public string PlateNumber { get => _plateNumber; set => _plateNumber = value.ToUpperInvariant(); }
 }
