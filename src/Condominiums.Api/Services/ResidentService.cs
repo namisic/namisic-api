@@ -62,6 +62,13 @@ public interface IResidentService
     #region Vehicles operations
 
     /// <summary>
+    /// Allows to obtain all the vehicles that belong to a resident by ID.
+    /// </summary>
+    /// <param name="id">Resident's id.</param>
+    /// <returns>Execution result with vehicles in Extra property.</returns>
+    Task<ServiceResult<List<VehicleDto>>> GetVehiclesAsync(string id);
+
+    /// <summary>
     /// Allows to create a vehicle.
     /// </summary>
     /// <param name="createVehicleDto">Vehicle information.</param>
@@ -450,6 +457,41 @@ public partial class ResidentService : IResidentService
             errorMessage = "Error deleting the vehicle.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult<List<VehicleDto>>> GetVehiclesAsync(string id)
+    {
+        _logger.LogDebug("Attempting to get vehicles.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(id))
+        {
+            errorMessage = "The 'Resident Id' field is required.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult<List<VehicleDto>>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            ServiceResult residentExists = await ExistsByIdAsync(id);
+
+            if (!residentExists.Success) return new ServiceResult<List<VehicleDto>>()
+            {
+                ErrorMessage = residentExists.ErrorMessage,
+                HttpStatusCode = residentExists.HttpStatusCode
+            };
+
+            List<Vehicle> vehicles = await _residentStore.GetVehiclesAsync(id);
+            List<VehicleDto> vehiclesDto = _mapper.Map<List<VehicleDto>>(vehicles);
+            _logger.LogInformation("Vehicles were getted.");
+            return new ServiceResult<List<VehicleDto>>() { Extra = vehiclesDto };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error getting vehicles.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<List<VehicleDto>>() { ErrorMessage = errorMessage };
         }
     }
 

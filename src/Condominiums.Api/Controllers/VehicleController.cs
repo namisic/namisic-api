@@ -20,6 +20,19 @@ public class VehiclesController : ControllerBase
     }
 
     /// <summary>
+    /// Allows you to obtain all the vehicles that belong to a resident by ID.
+    /// </summary>
+    [ProducesResponseType(typeof(List<VehicleDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(string id)
+    {
+        ServiceResult<List<VehicleDto>> result = await _residentService.GetVehiclesAsync(id);
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
     /// Allows to create a new vehicle.
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]

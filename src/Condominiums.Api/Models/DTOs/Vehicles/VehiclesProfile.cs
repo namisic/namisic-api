@@ -8,5 +8,6 @@ public class VehiclesProfile : Profile
     public VehiclesProfile()
     {
         CreateMap<CreateVehicleDto, Vehicle>();
+        CreateMap<Vehicle, VehicleDto>();
     }
 }

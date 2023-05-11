@@ -18,6 +18,12 @@ public interface IResidentStore : IStore<Resident>
     Task UpdateOneAsync(Resident resident);
 
     /// <summary>
+    /// Allows to obtain all the vehicles that belong to a resident by ID.
+    /// </summary>
+    /// <param name="id">Resident's id.</param>
+    Task<List<Vehicle>> GetVehiclesAsync(string id);
+
+    /// <summary>
     /// Allows adding a vehicle to a resident.
     /// </summary>
     /// <param name="id">Resident's id.</param>
@@ -71,6 +77,13 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
             .PullFilter(r => r.Vehicles, v => v.PlateNumber == plateNumber);
         return Collection.UpdateOneAsync(filter, update);
 
+    }
+
+    public async Task<List<Vehicle>> GetVehiclesAsync(string id)
+    {
+        FilterDefinition<Resident> filter = CreateFilterById(id);
+        Resident? resident = await Collection.Find(filter).FirstOrDefaultAsync();
+        return resident?.Vehicles ?? new List<Vehicle>();
     }
 
     public Task UpdateOneAsync(Resident resident)
