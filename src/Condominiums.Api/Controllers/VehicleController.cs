@@ -33,6 +33,19 @@ public class VehiclesController : ControllerBase
     }
 
     /// <summary>
+    /// Allows to filter the plate numbers of vehicles given a portion of this.
+    /// </summary>
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("filter-plate-numbers")]
+    public async Task<IActionResult> FilterPlateNumbers(string plateNumberHint)
+    {
+        ServiceResult<List<string>> result = await _residentService.FilterPlateNumbersAsync(plateNumberHint);
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
     /// Allows to create a new vehicle.
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
