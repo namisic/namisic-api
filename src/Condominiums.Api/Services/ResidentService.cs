@@ -89,6 +89,14 @@ public interface IResidentService
     /// <returns>Execution result.</returns>
     Task<ServiceResult> DeleteVehicleAsync(DeleteVehicleDto deleteVehicleDto);
 
+
+    /// <summary>
+    /// Allows to filter the plate numbers of vehicles given a portion of this.
+    /// </summary>
+    /// <param name="plateNumberHint">Plate number portion.</param>
+    /// <returns>Execution result with a list of plate numbers in Extra property.</returns>
+    Task<ServiceResult<List<string>>> FilterPlateNumbersAsync(string plateNumberHint);
+
     #endregion
 }
 
@@ -492,6 +500,32 @@ public partial class ResidentService : IResidentService
             errorMessage = "Error getting vehicles.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult<List<VehicleDto>>() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult<List<string>>> FilterPlateNumbersAsync(string plateNumberHint)
+    {
+        _logger.LogDebug("Attempting to filter plate numbers.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(plateNumberHint))
+        {
+            errorMessage = "Please give a hint of the vehicle's license plate number.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult<List<string>>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            List<string> plateNumbers = await _residentStore.FilterPlateNumbersAsync(plateNumberHint);
+            _logger.LogInformation($"'{plateNumbers.Count}' plate numbers found for '{plateNumberHint}'.");
+            return new ServiceResult<List<string>>() { Extra = plateNumbers };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error filtering plate numbers.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<List<string>>() { ErrorMessage = errorMessage };
         }
     }
 

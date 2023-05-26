@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Condominiums.Api.Models.Entities;
 using Condominiums.Api.Stores.Base;
 using MongoDB.Bson;
@@ -44,6 +45,13 @@ public interface IResidentStore : IStore<Resident>
     /// <param name="id">Resident's id.</param>
     /// <param name="plateNumber">Vehicles's initial plate number.</param>
     Task DeleteVehicleAsync(string id, string plateNumber);
+
+    /// <summary>
+    /// Allows to filter the plate numbers of vehicles given a portion of this.
+    /// </summary>
+    /// <param name="plateNumberHint">Plate number portion.</param>
+    /// <returns>List of plate numbers.</returns>
+    Task<List<string>> FilterPlateNumbersAsync(string plateNumberHint);
 }
 
 /// <summary>
@@ -77,6 +85,16 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
             .PullFilter(r => r.Vehicles, v => v.PlateNumber == plateNumber);
         return Collection.UpdateOneAsync(filter, update);
 
+    }
+
+    public async Task<List<string>> FilterPlateNumbersAsync(string plateNumberHint)
+    {
+        plateNumberHint = plateNumberHint.ToLower().Trim();
+        List<string> plateNumbers = await Collection.AsQueryable()
+            .SelectMany(r => r.Vehicles.Select(v => v.PlateNumber))
+            .Where(p => p.ToLower().Trim().StartsWith(plateNumberHint))
+            .ToListAsync();
+        return plateNumbers;
     }
 
     public async Task<List<Vehicle>> GetVehiclesAsync(string id)
