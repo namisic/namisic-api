@@ -52,6 +52,14 @@ public interface IResidentStore : IStore<Resident>
     /// <param name="plateNumberHint">Plate number portion.</param>
     /// <returns>List of plate numbers.</returns>
     Task<List<string>> FilterPlateNumbersAsync(string plateNumberHint);
+
+    /// <summary>
+    /// Allows to find a resident by searching for a vehicle with a license plate number.
+    /// </summary>
+    /// <param name="plateNumber">The license plate number to search.</param>
+    /// <param name="ignoreId">Resident ID to ignore.</param>
+    /// <returns>The resident found, otherwise <see langword="null"/></returns>
+    Task<Resident?> FindResidentByVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null);
 }
 
 /// <summary>
@@ -95,6 +103,24 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
             .Where(p => p.ToLower().Trim().StartsWith(plateNumberHint))
             .ToListAsync();
         return plateNumbers;
+    }
+
+    public async Task<Resident?> FindResidentByVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null)
+    {
+        plateNumber = plateNumber.ToLower().Trim();
+        FilterDefinitionBuilder<Resident> filterBuilder = Builders<Resident>.Filter;
+        FilterDefinition<Resident> baseFilter = Builders<Resident>.Filter.ElemMatch(
+            r => r.Vehicles,
+            v => v.PlateNumber.ToLower() == plateNumber
+        );
+        FilterDefinition<Resident> filter = baseFilter;
+        if (!string.IsNullOrEmpty(ignoreId))
+        {
+            ObjectId objectId = ObjectId.Parse(ignoreId);
+            filter = filterBuilder.And(baseFilter, filterBuilder.Ne(r => r.Id, objectId));
+        }
+        Resident? resident = await Collection.Find(filter).FirstOrDefaultAsync();
+        return resident;
     }
 
     public async Task<List<Vehicle>> GetVehiclesAsync(string id)
