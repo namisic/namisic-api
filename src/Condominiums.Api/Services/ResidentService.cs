@@ -57,6 +57,14 @@ public interface IResidentService
     /// <returns>Execution result.</returns>
     Task<ServiceResult> UpdateAsync(string id, UpdateResidentDto updateResidentDto);
 
+    /// <summary>
+    /// Validates if the vehicle plate number is unique.
+    /// </summary>
+    /// <param name="plateNumber">The license plate number to search.</param>
+    /// <param name="ignoreId">Resident ID to ignore.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> ValidateUniqueVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null);
+
     #endregion
 
     #region Vehicles operations
@@ -275,7 +283,7 @@ public partial class ResidentService : IResidentService
         {
             errorMessage = "Error searching the resident.";
             _logger.LogError(ex, errorMessage);
-            return new ServiceResult<ResidentDto>() { ErrorMessage = errorMessage };
+            return new ServiceResult() { ErrorMessage = errorMessage };
         }
     }
 
@@ -330,6 +338,40 @@ public partial class ResidentService : IResidentService
         }
     }
 
+    public async Task<ServiceResult> ValidateUniqueVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null)
+    {
+        _logger.LogDebug($"Attempting to validate if the vehicle plate number '{plateNumber}' is unique.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(plateNumber))
+        {
+            errorMessage = "Please indicate vehicle plate number.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            Resident? resident = await _residentStore.FindResidentByVehiclePlateNumberAsync(plateNumber, ignoreId);
+
+            if (resident != null)
+            {
+                errorMessage = $"This vehicle license plate number is assigned to the resident '{resident.Name}' of the apartment or house '{resident.ApartmentNumber}'.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            _logger.LogInformation($"The vehicle plate number '{plateNumber}' is unique.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error attempting to validate if the vehicle plate number '{plateNumber}' is unique.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
     #endregion
 
     #region Vehicles operations
@@ -359,6 +401,10 @@ public partial class ResidentService : IResidentService
             _logger.LogWarning(errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
+
+        ServiceResult plateNumberIsUniqueResult = await ValidateUniqueVehiclePlateNumberAsync(createVehicleDto.PlateNumber);
+
+        if (!plateNumberIsUniqueResult.Success) return plateNumberIsUniqueResult;
 
         try
         {
@@ -404,6 +450,13 @@ public partial class ResidentService : IResidentService
             _logger.LogWarning(errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
+
+        ServiceResult plateNumberIsUniqueResult = await ValidateUniqueVehiclePlateNumberAsync(
+            updateVehicleDto.PlateNumber,
+            updateVehicleDto.ResidentId
+        );
+
+        if (!plateNumberIsUniqueResult.Success) return plateNumberIsUniqueResult;
 
         try
         {
