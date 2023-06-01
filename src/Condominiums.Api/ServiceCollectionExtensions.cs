@@ -2,6 +2,7 @@ using System.Reflection;
 using Condominiums.Api.Models.DTOs.Residents;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -53,6 +54,10 @@ public static class ServiceCollectionExtensions
             config.MapInboundClaims = false;
             config.RequireHttpsMetadata = true;
             config.SaveToken = true;
+            config.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+            };
         });
 
         services.AddAuthorization(config =>
