@@ -1,8 +1,14 @@
 using System.Reflection;
+using System.Security.Claims;
+using Condominiums.Api.Auth;
+using Condominiums.Api.Auth.Handlers;
+using Condominiums.Api.Constants;
 using Condominiums.Api.Models.DTOs.Residents;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -34,20 +40,23 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
-        string? isServerUrl = configuration.GetValue<string>("IdServerUrl");
+        string? isServerUrl = configuration.GetValue<string>(Condominiums.Api.Constants.ConfigurationSection.IdServerUrl);
 
         if (string.IsNullOrEmpty(isServerUrl))
         {
-            Console.WriteLine("Please configure the IdServerUrl.");
+            Console.WriteLine("Please configure the '{0}'.", isServerUrl);
             Environment.Exit(1);
         }
 
-        services.AddAuthentication(options =>
+        string? clientId = configuration.GetValue<string>(Condominiums.Api.Constants.ConfigurationSection.ClientId);
+
+        if (string.IsNullOrEmpty(clientId))
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
+            Console.WriteLine("Please configure the '{0}'.", clientId);
+            Environment.Exit(1);
+        }
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(config =>
         {
             config.Authority = isServerUrl;
@@ -56,16 +65,48 @@ public static class ServiceCollectionExtensions
             config.SaveToken = true;
             config.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false,
+                ValidAudiences = new string[] { clientId },
+            };
+
+            config.Events = new JwtBearerEvents()
+            {
+                OnTokenValidated = async tokenValidatedContext =>
+                {
+                    HttpContext _httpContext = tokenValidatedContext.HttpContext;
+                    ClaimsIdentity claimsIdentity = new ClaimsIdentity();
+                    ClaimsPrincipal principal = tokenValidatedContext.Principal!;
+
+                    // Get the role claim from user info endpoint.
+                    string claimType = ClaimName.Role;
+                    if (!principal.HasClaim(claim => claim.Type == claimType))
+                    {
+                        var client = new HttpClient();
+                        var token = tokenValidatedContext.HttpContext.Request.Headers[HeaderNames.Authorization]
+                            .ToString()
+                            .Substring("Bearer ".Length);
+                        var response = await client.GetUserInfoAsync(new UserInfoRequest
+                        {
+                            Address = $"{isServerUrl}/userinfo",
+                            Token = token
+                        });
+
+                        if (!response.IsError)
+                        {
+                            List<Claim> claims = response.Claims.ToList();
+                            foreach (var roleClaim in claims.Where(claim => claim.Type == claimType))
+                            {
+                                claimsIdentity.AddClaim(new Claim(claimType, roleClaim.Value));
+                            }
+                        }
+                    }
+
+                    principal.AddIdentity(claimsIdentity);
+                }
             };
         });
 
-        services.AddAuthorization(config =>
-        {
-            config.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-        });
+        services.AddSingleton<IAuthorizationHandler, RoleHandler>();
+        services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
 
         return services;
     }
