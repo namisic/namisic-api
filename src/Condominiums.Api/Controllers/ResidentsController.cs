@@ -1,3 +1,4 @@
+using Condominiums.Api.Auth.Attributes;
 using Condominiums.Api.Models.DTOs.Residents;
 using Condominiums.Api.Services;
 using Condominiums.Api.Services.Base;
@@ -10,6 +11,7 @@ namespace Condominiums.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[AuthorizeRole(Constants.RoleNames.Administrator)]
 public class ResidentsController : ControllerBase
 {
     private readonly IResidentService _residentService;
