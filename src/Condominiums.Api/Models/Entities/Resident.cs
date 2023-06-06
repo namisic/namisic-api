@@ -1,4 +1,4 @@
-using Condominiums.Api.Stores.Base;
+using Condominiums.Api.Models.Base;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -9,9 +9,6 @@ namespace Condominiums.Api.Models.Entities;
 /// </summary>
 public class Resident : IHasId
 {
-    /// <summary>
-    /// The resident's identifier.
-    /// </summary>
     public ObjectId Id { get; set; }
 
     /// <summary>

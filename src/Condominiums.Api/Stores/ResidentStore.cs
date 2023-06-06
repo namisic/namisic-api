@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Condominiums.Api.Models.Entities;
 using Condominiums.Api.Stores.Base;
 using MongoDB.Bson;
@@ -60,6 +59,13 @@ public interface IResidentStore : IStore<Resident>
     /// <param name="ignoreId">Resident ID to ignore.</param>
     /// <returns>The resident found, otherwise <see langword="null"/></returns>
     Task<Resident?> FindResidentByVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null);
+
+    /// <summary>
+    /// Allows to validate if a vehicle exists by searching for its license plate number.
+    /// </summary>
+    /// <param name="plateNumber">The license plate number to search.</param>
+    /// <returns><see langword="true"/> if vehicle exists otherwise <see langword="false"/>.</returns>
+    Task<bool> ValidateIfVehicleExistsAsync(string plateNumber);
 }
 
 /// <summary>
@@ -151,5 +157,16 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
         UpdateDefinition<Resident> update = Builders<Resident>.Update
             .Set(r => r.Vehicles.FirstMatchingElement(), vehicle);
         return Collection.UpdateOneAsync(filter, update);
+    }
+
+    public async Task<bool> ValidateIfVehicleExistsAsync(string plateNumber)
+    {
+        plateNumber = plateNumber.Trim().ToLower();
+        FilterDefinition<Resident> filter = Builders<Resident>.Filter.ElemMatch(
+            r => r.Vehicles,
+            v => v.PlateNumber.Trim().ToLower() == plateNumber
+        );
+        long count = await Collection.CountDocumentsAsync(filter);
+        return count > 0;
     }
 }

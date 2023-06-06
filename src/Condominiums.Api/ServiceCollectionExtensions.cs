@@ -65,6 +65,7 @@ public static class ServiceCollectionExtensions
             config.SaveToken = true;
             config.TokenValidationParameters = new TokenValidationParameters
             {
+                NameClaimType = ClaimName.Sub,
                 ValidAudiences = new string[] { clientId },
             };
 

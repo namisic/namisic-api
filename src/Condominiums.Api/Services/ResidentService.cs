@@ -57,14 +57,6 @@ public interface IResidentService
     /// <returns>Execution result.</returns>
     Task<ServiceResult> UpdateAsync(string id, UpdateResidentDto updateResidentDto);
 
-    /// <summary>
-    /// Validates if the vehicle plate number is unique.
-    /// </summary>
-    /// <param name="plateNumber">The license plate number to search.</param>
-    /// <param name="ignoreId">Resident ID to ignore.</param>
-    /// <returns>Execution result.</returns>
-    Task<ServiceResult> ValidateUniqueVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null);
-
     #endregion
 
     #region Vehicles operations
@@ -97,13 +89,27 @@ public interface IResidentService
     /// <returns>Execution result.</returns>
     Task<ServiceResult> DeleteVehicleAsync(DeleteVehicleDto deleteVehicleDto);
 
-
     /// <summary>
     /// Allows to filter the plate numbers of vehicles given a portion of this.
     /// </summary>
     /// <param name="plateNumberHint">Plate number portion.</param>
     /// <returns>Execution result with a list of plate numbers in Extra property.</returns>
     Task<ServiceResult<List<string>>> FilterPlateNumbersAsync(string plateNumberHint);
+
+    /// <summary>
+    /// Validates if the vehicle plate number is unique.
+    /// </summary>
+    /// <param name="plateNumber">The license plate number to search.</param>
+    /// <param name="ignoreId">Resident ID to ignore.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> ValidateUniqueVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null);
+
+    /// <summary>
+    /// Allows to validate if a vehicle exists by searching for its license plate number.
+    /// </summary>
+    /// <param name="plateNumber">The license plate number to search.</param>
+    /// <returns>Execution result.</returns>
+    Task<ServiceResult> ValidateIfVehicleExistsAsync(string plateNumber);
 
     #endregion
 }
@@ -338,40 +344,6 @@ public partial class ResidentService : IResidentService
         }
     }
 
-    public async Task<ServiceResult> ValidateUniqueVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null)
-    {
-        _logger.LogDebug($"Attempting to validate if the vehicle plate number '{plateNumber}' is unique.");
-        string? errorMessage = null;
-
-        if (string.IsNullOrEmpty(plateNumber))
-        {
-            errorMessage = "Please indicate vehicle plate number.";
-            _logger.LogWarning(errorMessage);
-            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
-        }
-
-        try
-        {
-            Resident? resident = await _residentStore.FindResidentByVehiclePlateNumberAsync(plateNumber, ignoreId);
-
-            if (resident != null)
-            {
-                errorMessage = $"This vehicle license plate number is assigned to the resident '{resident.Name}' of the apartment or house '{resident.ApartmentNumber}'.";
-                _logger.LogWarning(errorMessage);
-                return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
-            }
-
-            _logger.LogInformation($"The vehicle plate number '{plateNumber}' is unique.");
-            return new ServiceResult();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error attempting to validate if the vehicle plate number '{plateNumber}' is unique.";
-            _logger.LogError(ex, errorMessage);
-            return new ServiceResult() { ErrorMessage = errorMessage };
-        }
-    }
-
     #endregion
 
     #region Vehicles operations
@@ -579,6 +551,74 @@ public partial class ResidentService : IResidentService
             errorMessage = "Error filtering plate numbers.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult<List<string>>() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult> ValidateUniqueVehiclePlateNumberAsync(string plateNumber, string? ignoreId = null)
+    {
+        _logger.LogDebug($"Attempting to validate if the vehicle plate number '{plateNumber}' is unique.");
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(plateNumber))
+        {
+            errorMessage = "Please indicate vehicle plate number.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            Resident? resident = await _residentStore.FindResidentByVehiclePlateNumberAsync(plateNumber, ignoreId);
+
+            if (resident != null)
+            {
+                errorMessage = $"This vehicle license plate number is assigned to the resident '{resident.Name}' of the apartment or house '{resident.ApartmentNumber}'.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            _logger.LogInformation($"The vehicle plate number '{plateNumber}' is unique.");
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error attempting to validate if the vehicle plate number '{plateNumber}' is unique.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult> ValidateIfVehicleExistsAsync(string plateNumber)
+    {
+        _logger.LogDebug("Attempting to validate if the vehicle exists by plate number '{0}'.", plateNumber);
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(plateNumber))
+        {
+            errorMessage = "Please indicate vehicle plate number.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            bool exists = await _residentStore.ValidateIfVehicleExistsAsync(plateNumber);
+
+            if (!exists)
+            {
+                errorMessage = "Vehicle not found.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            _logger.LogInformation("The vehicle found by '{0}' plate number.", plateNumber);
+            return new ServiceResult();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error attempting to validate if the vehicle exists by plate number '{plateNumber}'.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult() { ErrorMessage = errorMessage };
         }
     }
 

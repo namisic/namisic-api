@@ -8,5 +8,6 @@ public class UpdateVehicleDto : CreateVehicleDto
     /// Indicates the initial license plate number of the vehicle.
     /// </summary>
     [Required]
+    [MaxLength(8)]
     public string InitialPlateNumber { get; set; } = string.Empty;
 }
