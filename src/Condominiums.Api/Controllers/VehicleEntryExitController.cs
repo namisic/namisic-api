@@ -22,13 +22,28 @@ public class VehicleEntryExitController : ControllerBase
     }
 
     /// <summary>
+    /// Allows querying vehicle entry and exit records.
+    /// </summary>
+    [AuthorizeRole(RoleNames.Administrator, RoleNames.SecurityGuard)]
+    [HttpGet]
+    [ProducesResponseType(typeof(List<VehicleEntryExitDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Get(VehicleEntryExitFilters filters)
+    {
+        if (filters.CurrentUser) filters.CreatedBy = User.Identity!.Name!;
+        ServiceResult<List<VehicleEntryExitDto>> result = await _vehicleEntryExitService.FilterAsync(filters);
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
     /// Allows to create a new vehicle entry or exit.
     /// </summary>
+    [AuthorizeRole(RoleNames.SecurityGuard)]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpPost]
-    [AuthorizeRole(RoleNames.SecurityGuard)]
     public async Task<IActionResult> Post(CreateVehicleEntryExitDto createVehicleEntryExitDto)
     {
         string userName = User.Identity!.Name!;

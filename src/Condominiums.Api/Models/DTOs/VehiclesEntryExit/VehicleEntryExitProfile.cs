@@ -8,5 +8,6 @@ public class VehicleEntryExitProfile : Profile
     public VehicleEntryExitProfile()
     {
         CreateMap<CreateVehicleEntryExitDto, VehicleEntryExit>();
+        CreateMap<VehicleEntryExit, VehicleEntryExitDto>();
     }
 }

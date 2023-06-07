@@ -27,7 +27,7 @@ public class VehicleEntryExit : IHasId
     /// indicates any observation about the event.
     /// </summary>
     [BsonElement("remarks")]
-    public string Remarks { get; set; } = string.Empty;
+    public string? Remarks { get; set; }
 
     /// <summary>
     /// Indicates the date when the record was created

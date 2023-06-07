@@ -24,5 +24,5 @@ public class CreateVehicleEntryExitDto
     /// <summary>
     /// indicates any observation about the event.
     /// </summary>
-    public string Remarks { get; set; } = string.Empty;
+    public string? Remarks { get; set; }
 }

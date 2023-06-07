@@ -18,6 +18,13 @@ public interface IVehicleEntryExitService
     /// <param name="userName">name of the user who performed the action.</param>
     /// <returns>Execution result.</returns>
     Task<ServiceResult> CreateAsync(CreateVehicleEntryExitDto createVehicleEntryExitDto, string userName);
+
+    /// <summary>
+    /// Allows to query vehicle entry and exit records by using filters.
+    /// </summary>
+    /// <param name="filters">filters to be performed in the query.</param>
+    /// <returns>Records of vehicle entries and exits matching the given filters.</returns>
+    Task<ServiceResult<List<VehicleEntryExitDto>>> FilterAsync(VehicleEntryExitFilters filters);
 }
 
 /// <summary>
@@ -79,6 +86,25 @@ public class VehicleEntryExitService : IVehicleEntryExitService
             errorMessage = "Error saving the record of vehicle entry or exit.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult<List<VehicleEntryExitDto>>> FilterAsync(VehicleEntryExitFilters filters)
+    {
+        _logger.LogDebug("Attempting query vehicle entry or exit records.");
+
+        try
+        {
+            List<VehicleEntryExit> records = await _vehicleEntryExitStore.FilterAsync(filters);
+            List<VehicleEntryExitDto> recordsMapped = _mapper.Map<List<VehicleEntryExitDto>>(records);
+            _logger.LogInformation("Vehicle entry and exit records correctly consulted.");
+            return new ServiceResult<List<VehicleEntryExitDto>>() { Extra = recordsMapped };
+        }
+        catch (Exception ex)
+        {
+            string errorMessage = "Error querying vehicle entry or exit records.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<List<VehicleEntryExitDto>>() { ErrorMessage = errorMessage };
         }
     }
 }
