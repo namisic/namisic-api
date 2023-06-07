@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using Condominiums.Api.Constants;
+
 namespace Condominiums.Api.Models.DTOs.VehiclesEntryExit;
 
 /// <summary>
@@ -6,6 +9,8 @@ namespace Condominiums.Api.Models.DTOs.VehiclesEntryExit;
 public class VehicleEntryExitFilters
 {
     public string? PlateNumber { get; set; }
+
+    [MatchesValues(VehicleEntryExitType.Entry, VehicleEntryExitType.Exit)]
     public string? Type { get; set; }
     public DateTime? BeginCreationDate { get; set; }
     public DateTime? EndCreationDate { get; set; }
