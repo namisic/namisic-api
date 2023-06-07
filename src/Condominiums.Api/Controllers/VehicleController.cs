@@ -1,4 +1,5 @@
 using Condominiums.Api.Auth.Attributes;
+using Condominiums.Api.Constants;
 using Condominiums.Api.Models.DTOs.Vehicles;
 using Condominiums.Api.Services;
 using Condominiums.Api.Services.Base;
@@ -27,7 +28,7 @@ public class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet("{id}")]
-    [AuthorizeRole(Constants.RoleNames.Administrator)]
+    [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Get(string id)
     {
         ServiceResult<List<VehicleDto>> result = await _residentService.GetVehiclesAsync(id);
@@ -41,7 +42,7 @@ public class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet("filter-plate-numbers")]
-    [AuthorizeRole(Constants.RoleNames.SecurityGuard)]
+    [AuthorizeRole(RoleNames.SecurityGuard)]
     public async Task<IActionResult> FilterPlateNumbers(string plateNumberHint)
     {
         ServiceResult<List<string>> result = await _residentService.FilterPlateNumbersAsync(plateNumberHint);
@@ -55,7 +56,7 @@ public class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
-    [AuthorizeRole(Constants.RoleNames.Administrator)]
+    [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Post(CreateVehicleDto newVehicle)
     {
         ServiceResult result = await _residentService.AddVehicleAsync(newVehicle);
@@ -69,7 +70,7 @@ public class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPut]
-    [AuthorizeRole(Constants.RoleNames.Administrator)]
+    [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Put(UpdateVehicleDto vehicle)
     {
         ServiceResult result = await _residentService.UpdateVehicleAsync(vehicle);
@@ -83,7 +84,7 @@ public class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpDelete]
-    [AuthorizeRole(Constants.RoleNames.Administrator)]
+    [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Delete(DeleteVehicleDto vehicle)
     {
         ServiceResult result = await _residentService.DeleteVehicleAsync(vehicle);

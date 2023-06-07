@@ -1,4 +1,3 @@
-using Condominiums.Api.Stores.Base;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -15,7 +14,7 @@ public class Vehicle
     /// Indicates the type of vehicle. Possible values are "car" or "motorcycle". Default value is "car".
     /// </summary>
     [BsonElement("type")]
-    public string Type { get; set; } = "car";
+    public string Type { get; set; } = string.Empty;
 
     /// <summary>
     /// Indicates the license plate number of the vehicle.

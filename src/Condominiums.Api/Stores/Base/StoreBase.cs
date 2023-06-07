@@ -1,3 +1,4 @@
+using Condominiums.Api.Models.Base;
 using MongoDB.Bson;
 using MongoDB.Driver;
 

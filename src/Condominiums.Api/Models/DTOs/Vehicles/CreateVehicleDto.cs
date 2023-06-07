@@ -24,5 +24,6 @@ public class CreateVehicleDto
     /// Indicates the license plate number of the vehicle.
     /// </summary>
     [Required]
+    [MaxLength(8)]
     public string PlateNumber { get; set; } = string.Empty;
 }

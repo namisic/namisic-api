@@ -1,3 +1,4 @@
+using Condominiums.Api.Models.Base;
 using MongoDB.Driver;
 
 namespace Condominiums.Api.Stores.Base;

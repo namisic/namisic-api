@@ -1,6 +1,6 @@
 using MongoDB.Bson;
 
-namespace Condominiums.Api.Stores.Base;
+namespace Condominiums.Api.Models.Base;
 
 /// <summary>
 /// Defines the Id field to an entity.
