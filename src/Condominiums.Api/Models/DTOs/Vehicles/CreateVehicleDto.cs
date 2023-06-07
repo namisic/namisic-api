@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Condominiums.Api.Constants;
 
 namespace Condominiums.Api.Models.DTOs.Vehicles;
 
@@ -13,12 +14,12 @@ public class CreateVehicleDto
     [Required]
     public string ResidentId { get; set; } = string.Empty;
 
-    // TODO: Create validation attribute to allow only possible values.
     /// <summary>
     /// Indicates the type of vehicle. Possible values are "car" or "motorcycle". Default value is "car".
     /// </summary>
+    [MatchesValues(VehicleType.Car, VehicleType.Motorcycle)]
     [Required]
-    public string Type { get; set; } = "car";
+    public string Type { get; set; } = string.Empty;
 
     /// <summary>
     /// Indicates the license plate number of the vehicle.

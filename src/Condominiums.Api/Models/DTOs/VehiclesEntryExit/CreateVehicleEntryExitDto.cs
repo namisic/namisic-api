@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Condominiums.Api.Constants;
 
 namespace Condominiums.Api.Models.DTOs.VehiclesEntryExit;
 
@@ -17,8 +18,8 @@ public class CreateVehicleEntryExitDto
     /// <summary>
     /// Indicates the type of vehicle. Possible values are "entry" or "exit".
     /// </summary>
-    // TODO: Create validation attribute to allow only possible values.
     [Required]
+    [MatchesValues(VehicleEntryExitType.Entry, VehicleEntryExitType.Exit)]
     public string Type { get; set; } = string.Empty;
 
     /// <summary>
