@@ -36,6 +36,21 @@ public class VehiclesController : ControllerBase
     }
 
     /// <summary>
+    /// Allows you to obtain a vehicle by its license plate number.
+    /// </summary>
+    [ProducesResponseType(typeof(VehicleDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("get-by-plate-number")]
+    [AuthorizeRole(RoleNames.Administrator)]
+    public async Task<IActionResult> GetByPlateNumber(string plateNumber)
+    {
+        ServiceResult<VehicleDto> result = await _residentService.GetVehicleByPlateNumberAsync(plateNumber);
+        return this.ActionResultByServiceResult(result);
+    }
+
+    /// <summary>
     /// Allows to filter the plate numbers of vehicles given a portion of this.
     /// </summary>
     [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]

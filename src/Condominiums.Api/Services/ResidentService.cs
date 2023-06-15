@@ -116,7 +116,7 @@ public interface IResidentService
     /// </summary>
     /// <param name="plateNumber">The license plate number to search.</param>
     /// <returns>Execution result with the vehicle record in Extra property.</returns>
-    Task<ServiceResult<Vehicle>> GetVehicleByPlateNumberAsync(string plateNumber);
+    Task<ServiceResult<VehicleDto>> GetVehicleByPlateNumberAsync(string plateNumber);
 
     #endregion
 }
@@ -629,7 +629,7 @@ public partial class ResidentService : IResidentService
         }
     }
 
-    public async Task<ServiceResult<Vehicle>> GetVehicleByPlateNumberAsync(string plateNumber)
+    public async Task<ServiceResult<VehicleDto>> GetVehicleByPlateNumberAsync(string plateNumber)
     {
         _logger.LogDebug("Attempting to get a vehicle by plate number '{0}'.", plateNumber);
         string? errorMessage = null;
@@ -638,7 +638,7 @@ public partial class ResidentService : IResidentService
         {
             errorMessage = "Please indicate vehicle plate number.";
             _logger.LogWarning(errorMessage);
-            return new ServiceResult<Vehicle>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+            return new ServiceResult<VehicleDto>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
 
         try
@@ -649,17 +649,19 @@ public partial class ResidentService : IResidentService
             {
                 errorMessage = "Vehicle not found.";
                 _logger.LogWarning(errorMessage);
-                return new ServiceResult<Vehicle>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+                return new ServiceResult<VehicleDto>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
             }
 
+            VehicleDto vehicleDto = _mapper.Map<VehicleDto>(vehicle);
+
             _logger.LogInformation("The vehicle was found by '{0}' plate number.", plateNumber);
-            return new ServiceResult<Vehicle>() { Extra = vehicle };
+            return new ServiceResult<VehicleDto>() { Extra = vehicleDto };
         }
         catch (Exception ex)
         {
             errorMessage = $"Error attempting to get a vehicle by plate number '{plateNumber}'.";
             _logger.LogError(ex, errorMessage);
-            return new ServiceResult<Vehicle>() { ErrorMessage = errorMessage };
+            return new ServiceResult<VehicleDto>() { ErrorMessage = errorMessage };
         }
     }
 

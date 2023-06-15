@@ -1,4 +1,5 @@
 using AutoMapper;
+using Condominiums.Api.Models.DTOs.Vehicles;
 using Condominiums.Api.Models.DTOs.VehiclesEntryExit;
 using Condominiums.Api.Models.Entities;
 using Condominiums.Api.Services.Base;
@@ -69,13 +70,13 @@ public class VehicleEntryExitService : IVehicleEntryExitService
             return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
 
-        ServiceResult<Vehicle> vehicleByPlateNumberResult = await _residentService.GetVehicleByPlateNumberAsync(createVehicleEntryExitDto.PlateNumber);
+        ServiceResult<VehicleDto> vehicleByPlateNumberResult = await _residentService.GetVehicleByPlateNumberAsync(createVehicleEntryExitDto.PlateNumber);
 
         if (!vehicleByPlateNumberResult.Success) return vehicleByPlateNumberResult;
 
         try
         {
-            Vehicle vehicle = vehicleByPlateNumberResult.Extra!;
+            VehicleDto vehicle = vehicleByPlateNumberResult.Extra!;
             VehicleEntryExit newRecord = _mapper.Map<VehicleEntryExit>(createVehicleEntryExitDto);
             newRecord.CreatedBy = userName;
             newRecord.VehicleType = vehicle.Type;
