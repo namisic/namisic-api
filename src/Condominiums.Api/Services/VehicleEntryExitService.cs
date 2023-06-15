@@ -69,14 +69,16 @@ public class VehicleEntryExitService : IVehicleEntryExitService
             return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
 
-        ServiceResult vehicleExists = await _residentService.ValidateIfVehicleExistsAsync(createVehicleEntryExitDto.PlateNumber);
+        ServiceResult<Vehicle> vehicleByPlateNumberResult = await _residentService.GetVehicleByPlateNumberAsync(createVehicleEntryExitDto.PlateNumber);
 
-        if (!vehicleExists.Success) return vehicleExists;
+        if (!vehicleByPlateNumberResult.Success) return vehicleByPlateNumberResult;
 
         try
         {
+            Vehicle vehicle = vehicleByPlateNumberResult.Extra!;
             VehicleEntryExit newRecord = _mapper.Map<VehicleEntryExit>(createVehicleEntryExitDto);
             newRecord.CreatedBy = userName;
+            newRecord.VehicleType = vehicle.Type;
             await _vehicleEntryExitStore.InsertOneAsync(newRecord);
             _logger.LogInformation("The record of vehicle entry or exit was created.");
             return new ServiceResult();

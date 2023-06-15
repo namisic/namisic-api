@@ -111,6 +111,13 @@ public interface IResidentService
     /// <returns>Execution result.</returns>
     Task<ServiceResult> ValidateIfVehicleExistsAsync(string plateNumber);
 
+    /// <summary>
+    /// Allows to search a vehicle for its license plate number.
+    /// </summary>
+    /// <param name="plateNumber">The license plate number to search.</param>
+    /// <returns>Execution result with the vehicle record in Extra property.</returns>
+    Task<ServiceResult<Vehicle>> GetVehicleByPlateNumberAsync(string plateNumber);
+
     #endregion
 }
 
@@ -611,7 +618,7 @@ public partial class ResidentService : IResidentService
                 return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
             }
 
-            _logger.LogInformation("The vehicle found by '{0}' plate number.", plateNumber);
+            _logger.LogInformation("The vehicle was found by '{0}' plate number.", plateNumber);
             return new ServiceResult();
         }
         catch (Exception ex)
@@ -619,6 +626,40 @@ public partial class ResidentService : IResidentService
             errorMessage = $"Error attempting to validate if the vehicle exists by plate number '{plateNumber}'.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult<Vehicle>> GetVehicleByPlateNumberAsync(string plateNumber)
+    {
+        _logger.LogDebug("Attempting to get a vehicle by plate number '{0}'.", plateNumber);
+        string? errorMessage = null;
+
+        if (string.IsNullOrEmpty(plateNumber))
+        {
+            errorMessage = "Please indicate vehicle plate number.";
+            _logger.LogWarning(errorMessage);
+            return new ServiceResult<Vehicle>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        try
+        {
+            Vehicle? vehicle = await _residentStore.GetVehicleByPlateNumberAsync(plateNumber);
+
+            if (vehicle == null)
+            {
+                errorMessage = "Vehicle not found.";
+                _logger.LogWarning(errorMessage);
+                return new ServiceResult<Vehicle>() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
+            }
+
+            _logger.LogInformation("The vehicle was found by '{0}' plate number.", plateNumber);
+            return new ServiceResult<Vehicle>() { Extra = vehicle };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error attempting to get a vehicle by plate number '{plateNumber}'.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<Vehicle>() { ErrorMessage = errorMessage };
         }
     }
 

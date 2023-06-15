@@ -18,10 +18,17 @@ public class VehicleEntryExit : IHasId
     public string PlateNumber { get; set; } = string.Empty;
 
     /// <summary>
-    /// Indicates the type of vehicle. Possible values are "entry" or "exit".
+    /// Indicates the type of record. Possible values are "entry" or "exit".
     /// </summary>
     [BsonElement("type")]
     public string Type { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Indicates the type of vehicle. Possible values are "car" or "motorcycle".
+    /// </summary>
+    [BsonElement("vehicle_type")]
+    [BsonIgnoreIfNull]
+    public string? VehicleType { get; set; }
 
     /// <summary>
     /// indicates any observation about the event.

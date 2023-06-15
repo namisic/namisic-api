@@ -51,6 +51,12 @@ public class VehicleEntryExitStore : StoreBase<VehicleEntryExit>, IVehicleEntryE
             filterConditions.Add(filterBuilder.Where(v => v.Type.Trim().ToLower() == type));
         }
 
+        if (!string.IsNullOrEmpty(filters.VehicleType))
+        {
+            string vehicleType = filters.VehicleType.Trim().ToLower();
+            filterConditions.Add(filterBuilder.Where(v => v.VehicleType != null && v.VehicleType.Trim().ToLower() == vehicleType));
+        }
+
         if (filters.BeginCreationDate != null)
         {
             filterConditions.Add(filterBuilder.Gte(v => v.CreationDate, filters.BeginCreationDate));

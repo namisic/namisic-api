@@ -9,9 +9,10 @@ namespace Condominiums.Api.Models.DTOs.VehiclesEntryExit;
 public class VehicleEntryExitFilters
 {
     public string? PlateNumber { get; set; }
-
     [MatchesValues(VehicleEntryExitType.Entry, VehicleEntryExitType.Exit)]
     public string? Type { get; set; }
+    [MatchesValues(Constants.VehicleType.Car, Constants.VehicleType.Motorcycle)]
+    public string? VehicleType { get; set; }
     public DateTime? BeginCreationDate { get; set; }
     public DateTime? EndCreationDate { get; set; }
     public string? CreatedBy { get; set; }

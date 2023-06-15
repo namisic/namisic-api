@@ -66,6 +66,13 @@ public interface IResidentStore : IStore<Resident>
     /// <param name="plateNumber">The license plate number to search.</param>
     /// <returns><see langword="true"/> if vehicle exists otherwise <see langword="false"/>.</returns>
     Task<bool> ValidateIfVehicleExistsAsync(string plateNumber);
+
+    /// <summary>
+    /// Allows to search a vehicle for its license plate number.
+    /// </summary>
+    /// <param name="plateNumber">The license plate number to search.</param>
+    /// <returns>The vehicle record.</returns>
+    Task<Vehicle?> GetVehicleByPlateNumberAsync(string plateNumber);
 }
 
 /// <summary>
@@ -127,6 +134,15 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
         }
         Resident? resident = await Collection.Find(filter).FirstOrDefaultAsync();
         return resident;
+    }
+
+    public async Task<Vehicle?> GetVehicleByPlateNumberAsync(string plateNumber)
+    {
+        plateNumber = plateNumber.Trim().ToLower();
+        Vehicle? vehicle = await Collection.AsQueryable()
+            .SelectMany(r => r.Vehicles)
+            .FirstOrDefaultAsync(v => v.PlateNumber.Trim().ToLower() == plateNumber);
+        return vehicle;
     }
 
     public async Task<List<Vehicle>> GetVehiclesAsync(string id)
