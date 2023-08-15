@@ -4,6 +4,7 @@ using Condominiums.Api.Auth;
 using Condominiums.Api.Auth.Handlers;
 using Condominiums.Api.Constants;
 using Condominiums.Api.Models.DTOs.Residents;
+using Condominiums.Api.Options;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +41,8 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<RoleNameOptions>(configuration.GetSection("RoleNames"));
+
         string? isServerUrl = configuration.GetValue<string>(Condominiums.Api.Constants.ConfigurationSection.IdServerUrl);
 
         if (string.IsNullOrEmpty(isServerUrl))
