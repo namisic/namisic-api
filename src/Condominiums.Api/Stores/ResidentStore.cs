@@ -18,6 +18,16 @@ public interface IResidentStore : IStore<Resident>
     Task UpdateOneAsync(Resident resident);
 
     /// <summary>
+    /// Allows to validate if a resident exists by its document type and document number.
+    /// Optionally an Id can be specyfied to ignore it.
+    /// </summary>
+    /// <param name="documentType"></param>
+    /// <param name="documentNumber"></param>
+    /// <param name="ignoreId"></param>
+    /// <returns></returns>
+    Task<bool> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null);
+
+    /// <summary>
     /// Allows to obtain all the vehicles that belong to a resident by ID.
     /// </summary>
     /// <param name="id">Resident's id.</param>
@@ -106,6 +116,27 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
             .PullFilter(r => r.Vehicles, v => v.PlateNumber == plateNumber);
         return Collection.UpdateOneAsync(filter, update);
 
+    }
+
+    public async Task<bool> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null)
+    {
+        documentType = documentType.Trim().ToLower();
+        documentNumber = documentType.Trim().ToLower();
+        FilterDefinitionBuilder<Resident> filterBuilder = Builders<Resident>.Filter;
+        FilterDefinition<Resident> baseFilter = filterBuilder.And(
+            filterBuilder.Eq(f => f.DocumentType, documentType),
+            filterBuilder.Eq(f => f.DocumentNumber, documentNumber)
+        );
+        FilterDefinition<Resident> filter = baseFilter;
+
+        if (!string.IsNullOrEmpty(ignoreId))
+        {
+            ObjectId residentId = ObjectId.Parse(ignoreId);
+            filter = filterBuilder.And(filterBuilder.Ne(f => f.Id, residentId), baseFilter);
+        }
+
+        long count = await Collection.CountDocumentsAsync(filter);
+        return count > 0;
     }
 
     public async Task<List<string>> FilterPlateNumbersAsync(string plateNumberHint)
