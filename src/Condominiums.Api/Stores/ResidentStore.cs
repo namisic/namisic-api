@@ -14,10 +14,10 @@ public interface IResidentStore : IStore<Resident>
     /// Allows to validate if a resident exists by its document type and document number.
     /// Optionally an Id can be specyfied to ignore it.
     /// </summary>
-    /// <param name="documentType"></param>
-    /// <param name="documentNumber"></param>
-    /// <param name="ignoreId"></param>
-    /// <returns></returns>
+    /// <param name="documentType">The resident's document type to search.</param>
+    /// <param name="documentNumber">The resident's document number to search.</param>
+    /// <param name="ignoreId">Optional resident's Id to ignore.</param>
+    /// <returns>True if the resident exist by its document type and document number.</returns>
     Task<bool> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null);
 
     /// <summary>
@@ -39,8 +39,6 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
 
     public async Task<bool> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null)
     {
-        documentType = documentType.Trim().ToLower();
-        documentNumber = documentType.Trim().ToLower();
         FilterDefinitionBuilder<Resident> filterBuilder = Builders<Resident>.Filter;
         FilterDefinition<Resident> baseFilter = filterBuilder.And(
             filterBuilder.Eq(f => f.DocumentType, documentType),
@@ -64,6 +62,32 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
         UpdateDefinition<Resident> update = Builders<Resident>.Update
             .Set(r => r.Name, resident.Name)
             .Set(r => r.ApartmentNumber, resident.ApartmentNumber);
+
+        if (!string.IsNullOrEmpty(resident.Cellphone))
+        {
+            update = update.Set(f => f.Cellphone, resident.Cellphone);
+        }
+
+        if (!string.IsNullOrEmpty(resident.DocumentNumber))
+        {
+            update = update.Set(f => f.DocumentNumber, resident.DocumentNumber);
+        }
+
+        if (!string.IsNullOrEmpty(resident.DocumentType))
+        {
+            update = update.Set(f => f.DocumentType, resident.DocumentType);
+        }
+
+        if (!string.IsNullOrEmpty(resident.Email))
+        {
+            update = update.Set(f => f.Email, resident.Email);
+        }
+
+        if (!string.IsNullOrEmpty(resident.ResidentType))
+        {
+            update = update.Set(f => f.ResidentType, resident.ResidentType);
+        }
+
         return Collection.UpdateOneAsync(filter, update);
     }
 }

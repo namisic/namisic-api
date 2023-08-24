@@ -20,6 +20,16 @@ public interface IResidentService
     Task<ServiceResult> DeleteAsync(string id);
 
     /// <summary>
+    /// Allows to validate if a resident exists by its document type and document number.
+    /// Optionally an Id can be specyfied to ignore it.
+    /// </summary>
+    /// <param name="documentType">The resident's document type to search.</param>
+    /// <param name="documentNumber">The resident's document number to search.</param>
+    /// <param name="ignoreId">Optional resident's Id to ignore.</param>
+    /// <returns>Execution resul with Extra value: True if the resident exist by its document type and document number.</returns>
+    Task<ServiceResult<bool>> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null);
+
+    /// <summary>
     /// Allows to create a resident.
     /// </summary>
     /// <param name="createResidentDto">The resident's information.</param>
@@ -88,6 +98,14 @@ public partial class ResidentService : IResidentService
             errorMessage = "The 'name' field is required.";
             _logger.LogWarning(errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        ServiceResult<bool> existResident = await ExistsByDocumentAsync(createResidentDto.DocumentType, createResidentDto.DocumentNumber);
+
+        if (!existResident.Success)
+        {
+            _logger.LogWarning(existResident.ErrorMessage);
+            return new ServiceResult() { ErrorMessage = existResident.ErrorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
 
         try
@@ -235,7 +253,7 @@ public partial class ResidentService : IResidentService
     public async Task<ServiceResult> UpdateAsync(string id, UpdateResidentDto updateResidentDto)
     {
         _logger.LogDebug("Attempting to update a resident.");
-        string? errorMessage = null;
+        string? errorMessage;
 
         if (string.IsNullOrEmpty(id))
         {
@@ -258,6 +276,18 @@ public partial class ResidentService : IResidentService
             return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
 
+        ServiceResult<bool> existResident = await ExistsByDocumentAsync(
+            updateResidentDto.DocumentType,
+            updateResidentDto.ApartmentNumber,
+            id
+        );
+
+        if (!existResident.Success)
+        {
+            _logger.LogWarning(existResident.ErrorMessage);
+            return new ServiceResult() { ErrorMessage = existResident.ErrorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
+        }
+
         try
         {
             Resident? resident = await _residentStore.GetByIdAsync(id);
@@ -269,8 +299,7 @@ public partial class ResidentService : IResidentService
                 return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status404NotFound };
             }
 
-            resident.ApartmentNumber = updateResidentDto.ApartmentNumber;
-            resident.Name = updateResidentDto.Name;
+            _mapper.Map(updateResidentDto, resident);
             await _residentStore.UpdateOneAsync(resident);
             _logger.LogInformation($"Resident '{resident.Name}' updated.");
             return new ServiceResult();
@@ -280,6 +309,35 @@ public partial class ResidentService : IResidentService
             errorMessage = "Error updating the resident.";
             _logger.LogError(ex, errorMessage);
             return new ServiceResult() { ErrorMessage = errorMessage };
+        }
+    }
+
+    public async Task<ServiceResult<bool>> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null)
+    {
+        string? errorMessage = null;
+        _logger.LogDebug("Attempting to validate if a resident exists by its document type and document number.");
+
+        try
+        {
+            bool exist = false;
+
+            if (!string.IsNullOrEmpty(documentType) && !string.IsNullOrEmpty(documentNumber))
+            {
+                exist = await _residentStore.ExistsByDocumentAsync(documentType, documentNumber, ignoreId);
+            }
+
+            if (exist)
+            {
+                errorMessage = "Ya existe un residente con el mismo tipo de documento y número de documento.";
+            }
+
+            return new ServiceResult<bool>() { Extra = exist, ErrorMessage = errorMessage };
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error while attempting to validate if a resident exists by its document type and document number.";
+            _logger.LogError(ex, errorMessage);
+            return new ServiceResult<bool>() { ErrorMessage = errorMessage };
         }
     }
 }
