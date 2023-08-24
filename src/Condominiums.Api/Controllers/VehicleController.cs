@@ -14,11 +14,11 @@ namespace Condominiums.Api.Controllers;
 [Route("api/[controller]")]
 public class VehiclesController : ControllerBase
 {
-    private readonly IResidentService _residentService;
+    private readonly IVehicleService _vehicleService;
 
-    public VehiclesController(IResidentService residentService)
+    public VehiclesController(IVehicleService vehicleService)
     {
-        _residentService = residentService;
+        _vehicleService = vehicleService;
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public class VehiclesController : ControllerBase
     [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Get(string id)
     {
-        ServiceResult<List<VehicleDto>> result = await _residentService.GetVehiclesAsync(id);
+        ServiceResult<List<VehicleDto>> result = await _vehicleService.GetVehiclesAsync(id);
         return this.ActionResultByServiceResult(result);
     }
 
@@ -46,7 +46,7 @@ public class VehiclesController : ControllerBase
     [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> GetByPlateNumber(string plateNumber)
     {
-        ServiceResult<VehicleDto> result = await _residentService.GetVehicleByPlateNumberAsync(plateNumber);
+        ServiceResult<VehicleDto> result = await _vehicleService.GetVehicleByPlateNumberAsync(plateNumber);
         return this.ActionResultByServiceResult(result);
     }
 
@@ -60,7 +60,7 @@ public class VehiclesController : ControllerBase
     [AuthorizeRole(RoleNames.SecurityGuard)]
     public async Task<IActionResult> FilterPlateNumbers(string plateNumberHint)
     {
-        ServiceResult<List<string>> result = await _residentService.FilterPlateNumbersAsync(plateNumberHint);
+        ServiceResult<List<string>> result = await _vehicleService.FilterPlateNumbersAsync(plateNumberHint);
         return this.ActionResultByServiceResult(result);
     }
 
@@ -74,7 +74,7 @@ public class VehiclesController : ControllerBase
     [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Post(CreateVehicleDto newVehicle)
     {
-        ServiceResult result = await _residentService.AddVehicleAsync(newVehicle);
+        ServiceResult result = await _vehicleService.AddVehicleAsync(newVehicle);
         return this.ActionResultByServiceResult(result);
     }
 
@@ -88,7 +88,7 @@ public class VehiclesController : ControllerBase
     [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Put(UpdateVehicleDto vehicle)
     {
-        ServiceResult result = await _residentService.UpdateVehicleAsync(vehicle);
+        ServiceResult result = await _vehicleService.UpdateVehicleAsync(vehicle);
         return this.ActionResultByServiceResult(result);
     }
 
@@ -102,7 +102,7 @@ public class VehiclesController : ControllerBase
     [AuthorizeRole(RoleNames.Administrator)]
     public async Task<IActionResult> Delete(DeleteVehicleDto vehicle)
     {
-        ServiceResult result = await _residentService.DeleteVehicleAsync(vehicle);
+        ServiceResult result = await _vehicleService.DeleteVehicleAsync(vehicle);
         return this.ActionResultByServiceResult(result);
     }
 }
