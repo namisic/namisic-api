@@ -1,3 +1,4 @@
+using Condominiums.Api.Models.DTOs.Residents;
 using Condominiums.Api.Models.Entities;
 using Condominiums.Api.Stores.Base;
 using MongoDB.Bson;
@@ -10,6 +11,13 @@ namespace Condominiums.Api.Stores;
 /// </summary>
 public interface IResidentStore : IStore<Resident>
 {
+    /// <summary>
+    /// Allows to get a list with all the residents.
+    /// </summary>
+    /// <param name="filters">Filters to apply.</param>
+    /// <returns>Execution result with Resident information in Extra property if found.</returns>
+    Task<List<Resident>> GetAsync(GetResidentsQuery filters);
+
     /// <summary>
     /// Allows to validate if a resident exists by its document type and document number.
     /// Optionally an Id can be specyfied to ignore it.
@@ -54,6 +62,64 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
 
         long count = await Collection.CountDocumentsAsync(filter);
         return count > 0;
+    }
+
+    public async Task<List<Resident>> GetAsync(GetResidentsQuery filters)
+    {
+        FilterDefinitionBuilder<Resident> filterBuilder = Builders<Resident>.Filter;
+        List<FilterDefinition<Resident>> composedFilters = new List<FilterDefinition<Resident>>();
+        SortDefinition<Resident> sort = Builders<Resident>.Sort
+            .Ascending(r => r.Name)
+            .Ascending(r => r.ApartmentNumber);
+
+        if (!string.IsNullOrEmpty(filters.DocumentType))
+        {
+            composedFilters.Add(filterBuilder.Eq(f => f.DocumentType, filters.DocumentType));
+        }
+
+        if (!string.IsNullOrEmpty(filters.Cellphone))
+        {
+            composedFilters.Add(filterBuilder.Eq(f => f.Cellphone, filters.Cellphone));
+        }
+
+        if (!string.IsNullOrEmpty(filters.DocumentNumber))
+        {
+            composedFilters.Add(filterBuilder.Regex(f => f.DocumentNumber, new BsonRegularExpression(filters.DocumentNumber, "i")));
+        }
+
+        if (!string.IsNullOrEmpty(filters.ApartmentNumber))
+        {
+            composedFilters.Add(filterBuilder.Eq(f => f.ApartmentNumber, filters.ApartmentNumber));
+        }
+
+        if (!string.IsNullOrEmpty(filters.Email))
+        {
+            composedFilters.Add(filterBuilder.Regex(f => f.Email, new BsonRegularExpression(filters.Email, "i")));
+        }
+
+        if (!string.IsNullOrEmpty(filters.Name))
+        {
+            composedFilters.Add(filterBuilder.Regex(f => f.Name, new BsonRegularExpression(filters.Name, "i")));
+        }
+
+        if (!string.IsNullOrEmpty(filters.ResidentType))
+        {
+            composedFilters.Add(filterBuilder.Eq(f => f.ResidentType, filters.ResidentType));
+        }
+
+        FilterDefinition<Resident> filter = filterBuilder.Empty;
+
+        if (composedFilters.Count == 1)
+        {
+            filter = composedFilters.First();
+        }
+
+        if (composedFilters.Count > 1)
+        {
+            filter = composedFilters.Aggregate((current, next) => filterBuilder.And(current, next));
+        }
+
+        return await Collection.Find(filter).Sort(sort).ToListAsync();
     }
 
     public Task UpdateOneAsync(Resident resident)

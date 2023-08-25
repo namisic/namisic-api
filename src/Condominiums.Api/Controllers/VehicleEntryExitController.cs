@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Condominiums.Api.Auth.Attributes;
 using Condominiums.Api.Constants;
 using Condominiums.Api.Models.DTOs.VehiclesEntryExit;
@@ -30,27 +29,8 @@ public class VehicleEntryExitController : ControllerBase
     [ProducesResponseType(typeof(List<VehicleEntryExitDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Get(
-        string? plateNumber,
-        [MatchesValues(VehicleEntryExitType.Entry, VehicleEntryExitType.Exit)] string? type,
-        [MatchesValues(Constants.VehicleType.Car, Constants.VehicleType.Motorcycle)] string? vehicleType,
-        DateTime? beginCreationDate,
-        DateTime? endCreationDate,
-        string? createdBy,
-        bool currentUser
-    )
+    public async Task<IActionResult> Get([FromQuery] VehicleEntryExitFilters filters)
     {
-        var filters = new VehicleEntryExitFilters()
-        {
-            PlateNumber = plateNumber,
-            BeginCreationDate = beginCreationDate,
-            CreatedBy = createdBy,
-            CurrentUser = currentUser,
-            EndCreationDate = endCreationDate,
-            Type = type,
-            VehicleType = vehicleType
-        };
-
         if (filters.CurrentUser) filters.CreatedBy = User.Identity!.Name!;
         ServiceResult<List<VehicleEntryExitDto>> result = await _vehicleEntryExitService.FilterAsync(filters);
         return this.ActionResultByServiceResult(result);

@@ -39,8 +39,9 @@ public interface IResidentService
     /// <summary>
     /// Allows to get a list with all the residents.
     /// </summary>
+    /// <param name="filters">Filters to apply.</param>
     /// <returns>Execution result with Resident information in Extra property if found.</returns>
-    Task<ServiceResult<List<ResidentDto>>> GetAsync();
+    Task<ServiceResult<List<ResidentDto>>> GetAsync(GetResidentsQuery filters);
 
     /// <summary>
     /// Allows to get a resident by Id.
@@ -193,17 +194,14 @@ public partial class ResidentService : IResidentService
         }
     }
 
-    public async Task<ServiceResult<List<ResidentDto>>> GetAsync()
+    public async Task<ServiceResult<List<ResidentDto>>> GetAsync(GetResidentsQuery filters)
     {
         _logger.LogDebug("Attempting to get all the residents.");
         string? errorMessage = null;
 
         try
         {
-            SortDefinition<Resident> sort = Builders<Resident>.Sort
-                .Ascending(r => r.ApartmentNumber)
-                .Ascending(r => r.Name);
-            List<Resident> residents = await _residentStore.GetAllAsync(sort);
+            List<Resident> residents = await _residentStore.GetAsync(filters);
             List<ResidentDto> residentsDto = _mapper.Map<List<ResidentDto>>(residents);
             _logger.LogInformation($"All residents getted.");
             return new ServiceResult<List<ResidentDto>>() { Extra = residentsDto };
