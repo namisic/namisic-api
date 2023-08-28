@@ -41,9 +41,9 @@ public class ResidentsController : ControllerBase
     [ProducesResponseType(typeof(List<ResidentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] GetResidentsQuery filters)
     {
-        ServiceResult<List<ResidentDto>> result = await _residentService.GetAsync();
+        ServiceResult<List<ResidentDto>> result = await _residentService.GetAsync(filters);
         return this.ActionResultByServiceResult(result);
     }
 

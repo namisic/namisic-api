@@ -37,18 +37,21 @@ public class VehicleEntryExitService : IVehicleEntryExitService
     private readonly IMapper _mapper;
     private readonly IVehicleEntryExitStore _vehicleEntryExitStore;
     private readonly IResidentService _residentService;
+    private readonly IVehicleService _vehicleService;
 
     public VehicleEntryExitService(
         ILogger<VehicleEntryExitService> logger,
         IMapper mapper,
         IVehicleEntryExitStore vehicleEntryExitStore,
-        IResidentService residentService
+        IResidentService residentService,
+        IVehicleService vehicleService
     )
     {
         _logger = logger;
         _mapper = mapper;
         _vehicleEntryExitStore = vehicleEntryExitStore;
         _residentService = residentService;
+        _vehicleService = vehicleService;
     }
 
     public async Task<ServiceResult> CreateAsync(CreateVehicleEntryExitDto createVehicleEntryExitDto, string userName)
@@ -70,7 +73,7 @@ public class VehicleEntryExitService : IVehicleEntryExitService
             return new ServiceResult() { ErrorMessage = errorMessage, HttpStatusCode = StatusCodes.Status400BadRequest };
         }
 
-        ServiceResult<VehicleDto> vehicleByPlateNumberResult = await _residentService.GetVehicleByPlateNumberAsync(createVehicleEntryExitDto.PlateNumber);
+        ServiceResult<VehicleDto> vehicleByPlateNumberResult = await _vehicleService.GetVehicleByPlateNumberAsync(createVehicleEntryExitDto.PlateNumber);
 
         if (!vehicleByPlateNumberResult.Success) return vehicleByPlateNumberResult;
 
