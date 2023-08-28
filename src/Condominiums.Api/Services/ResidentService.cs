@@ -3,7 +3,6 @@ using Condominiums.Api.Models.DTOs.Residents;
 using Condominiums.Api.Models.Entities;
 using Condominiums.Api.Services.Base;
 using Condominiums.Api.Stores;
-using MongoDB.Driver;
 
 namespace Condominiums.Api.Services;
 
@@ -27,7 +26,7 @@ public interface IResidentService
     /// <param name="documentNumber">The resident's document number to search.</param>
     /// <param name="ignoreId">Optional resident's Id to ignore.</param>
     /// <returns>Execution resul with Extra value: True if the resident exist by its document type and document number.</returns>
-    Task<ServiceResult<bool>> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null);
+    Task<ServiceResult<bool>> ExistsByDocumentAsync(string? documentType, string? documentNumber, string? ignoreId = null);
 
     /// <summary>
     /// Allows to create a resident.
@@ -310,7 +309,7 @@ public partial class ResidentService : IResidentService
         }
     }
 
-    public async Task<ServiceResult<bool>> ExistsByDocumentAsync(string documentType, string documentNumber, string? ignoreId = null)
+    public async Task<ServiceResult<bool>> ExistsByDocumentAsync(string? documentType, string? documentNumber, string? ignoreId = null)
     {
         string? errorMessage = null;
         _logger.LogDebug("Attempting to validate if a resident exists by its document type and document number.");

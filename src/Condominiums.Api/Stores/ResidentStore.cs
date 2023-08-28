@@ -79,7 +79,7 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
 
         if (!string.IsNullOrEmpty(filters.Cellphone))
         {
-            composedFilters.Add(filterBuilder.Eq(f => f.Cellphone, filters.Cellphone));
+            composedFilters.Add(filterBuilder.Regex(f => f.Cellphone, new BsonRegularExpression(filters.Cellphone, "i")));
         }
 
         if (!string.IsNullOrEmpty(filters.DocumentNumber))
@@ -89,7 +89,7 @@ public class ResidentStore : StoreBase<Resident>, IResidentStore
 
         if (!string.IsNullOrEmpty(filters.ApartmentNumber))
         {
-            composedFilters.Add(filterBuilder.Eq(f => f.ApartmentNumber, filters.ApartmentNumber));
+            composedFilters.Add(filterBuilder.Regex(f => f.ApartmentNumber, new BsonRegularExpression(filters.ApartmentNumber, "i")));
         }
 
         if (!string.IsNullOrEmpty(filters.Email))

@@ -22,35 +22,35 @@ public class Resident : IHasId
     /// </summary>
     [BsonElement("document_type")]
     [BsonIgnoreIfNull]
-    public string DocumentType { get; set; } = string.Empty;
+    public string? DocumentType { get; set; }
 
     /// <summary>
     /// The resident's document number.
     /// </summary>
     [BsonElement("document_number")]
     [BsonIgnoreIfNull]
-    public string DocumentNumber { get; set; } = string.Empty;
+    public string? DocumentNumber { get; set; }
 
     /// <summary>
     /// The resident's e-mail.
     /// </summary>
     [BsonElement("email")]
     [BsonIgnoreIfNull]
-    public string Email { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
     /// <summary>
     /// The resident's cellphone.
     /// </summary>
     [BsonElement("cellphone")]
     [BsonIgnoreIfNull]
-    public string Cellphone { get; set; } = string.Empty;
+    public string? Cellphone { get; set; }
 
     /// <summary>
     /// The resident type. Could be "owner", "tenant" or "resident".
     /// </summary>
     [BsonElement("resident_type")]
     [BsonIgnoreIfNull]
-    public string ResidentType { get; set; } = string.Empty;
+    public string? ResidentType { get; set; }
 
     /// <summary>
     /// House or apartment number where the resident lives.

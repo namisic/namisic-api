@@ -7,7 +7,8 @@ namespace Condominiums.Api.Models.DTOs.Residents;
 /// </summary>
 public class UpdateResidentDto
 {
-    private string _documentType = string.Empty;
+    private string? _documentType;
+    private string? _residentType;
 
     /// <summary>
     /// The resident's name.
@@ -23,23 +24,24 @@ public class UpdateResidentDto
         Constants.DocumentType.CedulaExtranjeria,
         Constants.DocumentType.TarjetaIdentidad
     )]
-    public string DocumentType { get => _documentType; set => _documentType = value.ToLower(); }
+    public string? DocumentType { get => _documentType; set => _documentType = value?.ToLower(); }
+
     /// <summary>
     /// The resident's document number.
     /// </summary>
-    public string DocumentNumber { get; set; } = string.Empty;
+    public string? DocumentNumber { get; set; }
 
     /// <summary>
     /// The resident's e-mail.
     /// </summary>
     [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
     /// <summary>
     /// The resident's cellphone.
     /// </summary>
     [Phone]
-    public string Cellphone { get; set; } = string.Empty;
+    public string? Cellphone { get; set; }
 
     /// <summary>
     /// The resident type. Could be "owner", "tenant" or "resident".
@@ -49,7 +51,7 @@ public class UpdateResidentDto
         Constants.ResidentType.Resident,
         Constants.ResidentType.Tenant
     )]
-    public string ResidentType { get; set; } = string.Empty;
+    public string? ResidentType { get => _residentType; set => _residentType = value?.ToLower(); }
 
     /// <summary>
     /// House or apartment number where the resident lives.

@@ -4,9 +4,7 @@ namespace Condominiums.Api.Models.DTOs.Residents;
 
 public class GetResidentsQuery
 {
-    private string? _name;
-
-    public string? Name { get => _name; set => _name = !string.IsNullOrEmpty(value) ? value.ToLower() : value; }
+    public string? Name { get; set; }
 
     [MatchesValues(
         Constants.DocumentType.CedulaCiudadania,

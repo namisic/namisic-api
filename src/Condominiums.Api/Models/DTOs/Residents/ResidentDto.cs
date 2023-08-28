@@ -18,27 +18,27 @@ public class ResidentDto
     /// <summary>
     /// The resident's document type.
     /// </summary>
-    public string DocumentType { get; set; } = string.Empty;
+    public string? DocumentType { get; set; }
 
     /// <summary>
     /// The resident's document number.
     /// </summary>
-    public string DocumentNumber { get; set; } = string.Empty;
+    public string? DocumentNumber { get; set; }
 
     /// <summary>
     /// The resident's e-mail.
     /// </summary>
-    public string Email { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
     /// <summary>
     /// The resident's cellphone.
     /// </summary>
-    public string Cellphone { get; set; } = string.Empty;
+    public string? Cellphone { get; set; }
 
     /// <summary>
     /// The resident type. Could be "owner", "tenant" or "resident".
     /// </summary>
-    public string ResidentType { get; set; } = string.Empty;
+    public string? ResidentType { get; set; }
 
     /// <summary>
     /// House or apartment number where the resident lives.
