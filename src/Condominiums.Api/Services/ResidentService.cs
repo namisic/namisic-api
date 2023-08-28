@@ -275,7 +275,7 @@ public partial class ResidentService : IResidentService
 
         ServiceResult<bool> existResident = await ExistsByDocumentAsync(
             updateResidentDto.DocumentType,
-            updateResidentDto.ApartmentNumber,
+            updateResidentDto.DocumentNumber,
             id
         );
 
