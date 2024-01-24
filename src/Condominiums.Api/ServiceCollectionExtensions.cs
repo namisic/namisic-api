@@ -23,7 +23,12 @@ public static class ServiceCollectionExtensions
         // Register dependencies dynamically.
         Type[] allClasses = Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && (t.Name.EndsWith("Store") || t.Name.EndsWith("Service")))
+            .Where(t => t.IsClass && !t.IsAbstract && (
+                t.Name.EndsWith("Store")
+                || t.Name.EndsWith("Service")
+                || t.Name.EndsWith("Farmer")
+                || t.Name.EndsWith("Seed")
+            ))
             .ToArray();
 
         foreach (Type classType in allClasses)

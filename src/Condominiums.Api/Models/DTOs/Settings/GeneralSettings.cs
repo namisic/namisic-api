@@ -4,9 +4,9 @@ public class GeneralSettings
 {
     public static readonly string SettingName = "general";
     public string CondominiumName { get; set; }
-    public string Description { get; set; }
-    public string BackgroundImagePath { get; set; }
-    public string Location { get; set; }
-    public string Phone { get; set; }
-    public string CoexistenceManualPath { get; set; }
+    public string CondominiumDescription { get; set; }
+    public string CondominiumLocation { get; set; }
+    public string CondominiumPhone { get; set; }
+    public string CondominiumCoexistenceManualPath { get; set; }
+    public string HomePageBackgroundImagePath { get; set; }
 }

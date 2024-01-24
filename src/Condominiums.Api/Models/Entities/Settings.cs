@@ -6,6 +6,12 @@ namespace Condominiums.Api.Models.Entities;
 
 public class Settings : IHasId
 {
+    public Settings(string name, BsonDocument value)
+    {
+        Name = name;
+        Value = value;
+    }
+
     public ObjectId Id { get; set; }
 
     [BsonElement("name")]

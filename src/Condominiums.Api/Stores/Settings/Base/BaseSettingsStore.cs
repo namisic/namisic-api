@@ -39,6 +39,17 @@ public abstract class BaseSettingsStore<TSettings> : ISettingsStore<TSettings>
         return (TSettings)settings;
     }
 
+    public async Task InsertAsync(TSettings settings)
+    {
+        Dictionary<string, string> values = settings.GetType()
+            .GetProperties()
+            .ToDictionary(p => p.Name, p => p.GetValue(settings)!.ToString()!);
+        var valuesBsonDocument = new BsonDocument(values);
+        var newSettings = new Entities.Settings(Name, valuesBsonDocument);
+
+        await Collection.InsertOneAsync(newSettings);
+    }
+
     public Task UpdateAsync(TSettings settings)
     {
         FilterDefinition<Entities.Settings> filter = Builders<Entities.Settings>.Filter.Eq(s => s.Name, Name);
@@ -46,6 +57,7 @@ public abstract class BaseSettingsStore<TSettings> : ISettingsStore<TSettings>
             .GetProperties()
             .ToDictionary(p => p.Name, p => p.GetValue(settings)!.ToString()!);
         var bsonDocument = new BsonDocument(values);
+
         UpdateDefinition<Entities.Settings> updateDefinition = Builders<Entities.Settings>.Update
             .Set(s => s.Value, bsonDocument);
 
