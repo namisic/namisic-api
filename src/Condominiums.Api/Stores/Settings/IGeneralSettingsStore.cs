@@ -3,7 +3,7 @@ using Condominiums.Api.Stores.Settings.Base;
 
 namespace Condominiums.Api.Stores.Settings
 {
-    public interface IGeneralSettingsStore : ISettingsStore<GeneralSettings>
+    public interface IGeneralSettingsStore : ISettingsStore<GeneralSettingsDto>
     {
 
     }

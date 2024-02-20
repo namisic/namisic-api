@@ -4,9 +4,9 @@ using MongoDB.Driver;
 
 namespace Condominiums.Api.Stores.Settings;
 
-public class GeneralSettingsStore : BaseSettingsStore<GeneralSettings>, IGeneralSettingsStore
+public class GeneralSettingsStore : BaseSettingsStore<GeneralSettingsDto>, IGeneralSettingsStore
 {
-    public GeneralSettingsStore(IMongoDatabase database) : base(GeneralSettings.SettingName, database)
+    public GeneralSettingsStore(IMongoDatabase database) : base(Constants.Database.Settings.General, database)
     {
     }
 }

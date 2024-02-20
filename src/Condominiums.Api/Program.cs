@@ -1,4 +1,5 @@
-using Condominiums.Api.Models.DTOs.Settings;
+using AppContants = Condominiums.Api.Constants;
+using Condominiums.Api.Options;
 using Condominiums.Api.Seeds.Base;
 using MongoDB.Driver;
 
@@ -16,10 +17,11 @@ if (!(allowedCorsOrigins?.Any() ?? false))
     Environment.Exit(1);
 }
 
-builder.Services.Configure<GeneralSettings>(builder.Configuration.GetSection("GeneralSettings"));
+builder.Services.Configure<GeneralSettingsOptions>(builder.Configuration.GetSection(AppContants.ConfigurationSection.GeneralSettings));
 
 builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(connectionString));
 builder.Services.AddScoped<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDbname));
+
 // CORS policy.
 builder.Services.AddCors(options => options.AddDefaultPolicy(
     config => config.AllowAnyHeader().AllowAnyMethod().WithOrigins(allowedCorsOrigins!)
@@ -30,7 +32,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 using (IServiceScope? scope = app.Services.CreateScope())
 {
