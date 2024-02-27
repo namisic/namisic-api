@@ -8,5 +8,6 @@ public class SettingsProfile : Profile
     public SettingsProfile()
     {
         CreateMap<GeneralSettingsOptions, GeneralSettingsDto>();
+        CreateMap<UpdateGeneralSettingsDto, GeneralSettingsDto>();
     }
 }
