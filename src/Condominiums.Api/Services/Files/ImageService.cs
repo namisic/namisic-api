@@ -21,6 +21,6 @@ public class ImageService : BaseFileService, IImageService
 
     public Task SaveAsync(Stream stream, ImageType imageType, CancellationToken cancellationToken = default)
     {
-        
+        return Task.CompletedTask;
     }
 }

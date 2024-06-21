@@ -2,6 +2,7 @@ using AppContants = Condominiums.Api.Constants;
 using Condominiums.Api.Options;
 using Condominiums.Api.Seeds.Base;
 using MongoDB.Driver;
+using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,10 @@ builder.Services.AddScoped<IMongoDatabase>(sp => sp.GetRequiredService<IMongoCli
 builder.Services.AddCors(options => options.AddDefaultPolicy(
     config => config.AllowAnyHeader().AllowAnyMethod().WithOrigins(allowedCorsOrigins!)
 ));
-builder.Services.AddApi(builder.Configuration);
+
+builder.Services.AddApi()
+    .AddAuth(builder.Configuration, builder.Environment.IsDevelopment());
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -45,6 +49,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    IdentityModelEventSource.ShowPII = true;
 }
 
 app.UseHttpsRedirection();

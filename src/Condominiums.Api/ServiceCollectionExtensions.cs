@@ -15,9 +15,8 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddApi(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApi(this IServiceCollection services)
     {
-        services.AddAuth(configuration);
         services.AddAutoMapper(typeof(ResidentsProfile));
 
         // Register dependencies dynamically.
@@ -44,7 +43,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
         services.Configure<RoleNameOptions>(configuration.GetSection("RoleNames"));
 
@@ -76,6 +75,14 @@ public static class ServiceCollectionExtensions
                 NameClaimType = ClaimName.Sub,
                 ValidAudiences = new string[] { clientId },
             };
+
+            if (isDevelopment)
+            {
+                config.BackchannelHttpHandler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = delegate { return true; }
+                };
+            }
 
             config.Events = new JwtBearerEvents()
             {
