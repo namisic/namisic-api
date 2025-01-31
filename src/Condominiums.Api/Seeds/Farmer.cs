@@ -18,6 +18,13 @@ public class Farmer : IFarmer
     {
         _logger.LogTrace("Planting seeds");
 
-        await _generalSettingsSeed.SeedAsync();
+        try
+        {
+            await _generalSettingsSeed.SeedAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error plantando semillas: {error}", [new { error = ex.Message }]);
+        }
     }
 }
