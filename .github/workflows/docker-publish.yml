@@ -7,7 +7,7 @@ name: Imagen de Docker
 
 on:
   push:
-    branches: [ "main", "container-registry" ]
+    branches: [ "main" ]
     tags: [ '*' ]
 
 env:
