@@ -8,7 +8,7 @@
     "containerEnv": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://*:5000",
-        "MongoDB__ConnectionString": "mongodb://namiUserApp.gatito_MIau@localhost:27017/"
+        "MongoDB__ConnectionString": "mongodb://namiUserApp:gatito_MIau@localhost:27017/"
     },
 
     // Features to add to the dev container. More info: https://containers.dev/features.
