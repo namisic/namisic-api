@@ -1,26 +1,30 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
-    "name": "NamiSIC",
+    "name": "Nami SIC API",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
     "image": "mcr.microsoft.com/devcontainers/dotnet:dev-9.0",
 
     "containerEnv": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://*:5000",
-        "MongoDB__ConnectionString": "mongodb://namiUserApp:gatito_MIau@localhost:27017/"
+        "ASPNETCORE_URLS": "http://*:5062",
+        "MongoDB__ConnectionString": "mongodb://eladmin:namisic_2025@namisic_db_local:27017/"
     },
 
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
-    "forwardPorts": [5000],
+    "forwardPorts": [5062],
     // "portsAttributes": {
     //     "5001": {
     //         "protocol": "https"
     //     }
     // },
+
+    "runArgs": [
+        "--network=namisic_local_net"
+    ],
 
     // Use 'postCreateCommand' to run commands after the container is created.
     "postCreateCommand": "dotnet restore src/Condominiums.Api/Condominiums.Api.csproj",

@@ -1,8 +1,8 @@
 name: namisic_local
 
 networks:
-  namisic_local:
-    driver: bridge
+  namisic_local_net:
+    external: true
 
 volumes:
   namisic_local_db:
@@ -10,13 +10,14 @@ volumes:
 services:
   mongodb:
     image: mongodb/mongodb-community-server:6.0.7-ubuntu2204
+    container_name: namisic_db_local
     environment:
       - MONGO_INITDB_ROOT_USERNAME=eladmin
       - MONGO_INITDB_ROOT_PASSWORD=namisic_2025
     ports:
       - 27017:27017
     networks:
-      - namisic_local
+      - namisic_local_net
     restart: on-failure:3
     volumes:
       - namisic_local_db:/data/db
@@ -26,6 +27,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: namisic_api_local
     depends_on:
       - mongodb
     environment:
@@ -36,7 +38,7 @@ services:
     ports:
       - 5000:80
     networks:
-      - namisic_local
+      - namisic_local_net
     restart: on-failure:3
     volumes:
       - ./src:/app
