@@ -1,6 +1,6 @@
 # API de NamiSIC
 
-Este repositorio contiene la API de la aplicación NamiSIC, construida con .NET 9 usando el lenguaje C#.
+Este repositorio contiene la API de la aplicación NamiSIC, construida con .NET 9 usando el lenguaje C#. Pensada para usar base de datos MongoDB.
 
 # Ejecución local con Docker Compose
 
@@ -8,22 +8,36 @@ Primero debes tener instalado Docker Compose en la máquina. Sigue [la guía de 
 
 ## Crear red de Docker
 
-Para permitir la comunicación entre los contenedores se debe crear una red de Docker con el siguiente comando:
+Se debe crear una red de Docker para permitir la comunicación entre los contenedores:
 
 ```
-docker network create -d bridge --attachable namisic_local_net
+docker network create -d bridge namisic_local_net
 ```
 
-## Crear contenedores
+## Crear base de datos
 
-Para crear los contenedores de MongoDB y la API, ejecuta el siguiente comando:
+Primero se debe crear el contenedor de MongoDB:
 
 ```
-docker compose -f ./docker-compose-local.yml up -d
+docker compose -f ./docker-compose.local.yml up -d mongodb
 ```
 
-Espera a que termine la ejecución del comando y visita http://localhost:5000/swagger para consultar la definición de la API.
+Una vez creado el contenedor, se debe ejecutar el script [create_local_database.js](./mongodb/create_local_database.js) que es el que se encarga de crear la base de datos:
+
+```
+docker compose -f ./docker-compose.local.yml exec mongodb mongosh --file /data/db/scripts/create_local_database.js
+```
+
+## Crear contenedor de la API
+
+Finalmente, crea el contenedor la API:
+
+```
+docker compose -f ./docker-compose.local.yml up -d api
+```
+
+> Visita http://localhost:5000/swagger para consultar la definición de la API.
 
 # Más información
 
-Si deseas conocer más del proyecto visita mi blog: https://lechediaz.com/category/proyectos/namisic/
+Si deseas conocer más del proyecto [visita mi blog](https://lechediaz.com/category/proyectos/namisic/).

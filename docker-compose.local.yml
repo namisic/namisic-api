@@ -10,7 +10,7 @@ volumes:
 services:
   mongodb:
     image: mongodb/mongodb-community-server:6.0.7-ubuntu2204
-    container_name: namisic_db_local
+    container_name: namisic_local_db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=eladmin
       - MONGO_INITDB_ROOT_PASSWORD=namisic_2025
@@ -18,7 +18,6 @@ services:
       - 27017:27017
     networks:
       - namisic_local_net
-    restart: on-failure:3
     volumes:
       - namisic_local_db:/data/db
       - ./mongodb:/data/db/scripts
@@ -27,18 +26,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: namisic_api_local
+    container_name: namisic_local_api
     depends_on:
       - mongodb
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://*:80
-      MongoDB__ConnectionString: mongodb://eladmin:namisic_2025@mongodb/
-      MongoDB__DbName: namiSIC
+      MongoDB__ConnectionString: mongodb://eladmin:namisic_2025@mongodb/namisic
+      MongoDB__DbName: namisic
+      IdServerUrl: https://auth.lechediaz.com/demo
+      ClientId: namisic
+      RoleNames__Administrator: namisic/representante_legal
+      RoleNames__SecurityGuard: namisic/empleado_seguridad
     ports:
       - 5000:80
     networks:
       - namisic_local_net
-    restart: on-failure:3
     volumes:
       - ./src:/app
