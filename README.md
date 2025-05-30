@@ -1,6 +1,6 @@
-# API de NamiSIC
+# API de Nami SIC
 
-Este repositorio contiene la API de la aplicación NamiSIC, construida con .NET 9 usando el lenguaje C#. Pensada para usar base de datos MongoDB.
+Este repositorio contiene la API de la aplicación Nami SIC, construida con .NET 9 usando el lenguaje C#. Pensada para ser usada junto a una base de datos MongoDB y alguna solución IAM como SimpleIdServer o IdentityServer.
 
 # Ejecución local con Docker Compose
 
