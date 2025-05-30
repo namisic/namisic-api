@@ -15,15 +15,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-namespace Condominiums.Api.Options;
+using Condominiums.Api.Base;
 
-public class GeneralSettingsOptions
+namespace Condominiums.Api.UploadFiles;
+
+/// <summary>
+/// Defines the method that allows to upload a file.
+/// </summary>
+public interface IUploadFile
 {
-    public const string ConfigurationSection = "GeneralSettings";
-    public string CondominiumName { get; set; }
-    public string CondominiumDescription { get; set; }
-    public string CondominiumAddress { get; set; }
-    public string CondominiumPhone { get; set; }
-    public string CondominiumCoexistenceManualPath { get; set; }
-    public string HomePageBackgroundImagePath { get; set; }
+    /// <summary>
+    /// Uploads a file asynchronously.
+    /// </summary>
+    /// <param name="fileStream">The file stream to upload.</param>
+    /// <param name="extension">The file extension, including the dot (e.g., ".jpg").</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the result of the upload operation.</returns>
+    Task<Result<string>> UploadAsync(FileStream fileStream, string extension, CancellationToken cancellationToken = default);
 }

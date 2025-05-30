@@ -15,15 +15,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-namespace Condominiums.Api.Options;
+using Condominiums.Api.Options;
+using Microsoft.Extensions.Options;
 
-public class GeneralSettingsOptions
+namespace Condominiums.Api.UploadFiles.CoexistenceManual;
+
+/// <summary>
+/// Uploads coexistence manuals to the server.
+/// </summary>
+public class UploadCoexistenceManual(IOptions<FilesOptions> filesOptions) : UploadFileBase(filesOptions.Value.DocumentsPath, s_validFileExtensions, filesOptions.Value.MaxSize), IUploadCoexistenceManual
 {
-    public const string ConfigurationSection = "GeneralSettings";
-    public string CondominiumName { get; set; }
-    public string CondominiumDescription { get; set; }
-    public string CondominiumAddress { get; set; }
-    public string CondominiumPhone { get; set; }
-    public string CondominiumCoexistenceManualPath { get; set; }
-    public string HomePageBackgroundImagePath { get; set; }
+    /// <summary>
+    /// Valid file extensions supported by the coexistence manual upload service.
+    /// </summary>
+    private static readonly IReadOnlyCollection<string> s_validFileExtensions =
+    [
+        ".pdf",
+    ];
 }

@@ -27,13 +27,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
+using MongoDB.Driver;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddApi(this IServiceCollection services)
+    public static IServiceCollection AddApi(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
+        services.AddMongoDb(configuration);
+
+        services.Configure<GeneralSettingsOptions>(configuration.GetSection(GeneralSettingsOptions.ConfigurationSection));
+        services.Configure<FilesOptions>(configuration.GetSection(FilesOptions.ConfigurationSection));
+
         services.AddAutoMapper(typeof(ResidentsProfile));
 
         // Register dependencies dynamically.
@@ -44,6 +50,7 @@ public static class ServiceCollectionExtensions
                 || t.Name.EndsWith("Service")
                 || t.Name.EndsWith("Farmer")
                 || t.Name.EndsWith("Seed")
+                || t.Name.StartsWith("Upload")
             ))
             .ToArray();
 
@@ -57,10 +64,36 @@ public static class ServiceCollectionExtensions
             }
         }
 
+        services.AddAuth(configuration, isDevelopment);
+        services.AddCors(configuration);
+
         return services;
     }
 
-    public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
+    private static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
+    {
+        string? connectionString = configuration["MongoDB:ConnectionString"];
+        string? mongoDbName = configuration["MongoDB:DbName"];
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("Por favor configure la cadena de conexión para la base de datos de MongoDB.");
+            Environment.Exit(1);
+        }
+
+        if (string.IsNullOrEmpty(mongoDbName))
+        {
+            Console.WriteLine("Por favor configure el nombre la base de datos de MongoDB a utilizar.");
+            Environment.Exit(1);
+        }
+
+        services.AddSingleton<IMongoClient>(sp => new MongoClient(connectionString));
+        services.AddScoped<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoDbName));
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
         services.Configure<RoleNameOptions>(configuration.GetSection("RoleNames"));
 
@@ -140,6 +173,24 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IAuthorizationHandler, RoleHandler>();
         services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        string[]? allowedCorsOrigins = configuration.GetSection("AllowedCorsOrigins").Get<string[]>();
+
+        if (allowedCorsOrigins?.Length == 0)
+        {
+            Console.WriteLine("Por favor configure los orígenes de CORS permitidos.");
+            Environment.Exit(1);
+        }
+
+        // CORS policy.
+        services.AddCors(options => options.AddDefaultPolicy(
+            config => config.AllowAnyHeader().AllowAnyMethod().WithOrigins(allowedCorsOrigins!)
+        ));
 
         return services;
     }

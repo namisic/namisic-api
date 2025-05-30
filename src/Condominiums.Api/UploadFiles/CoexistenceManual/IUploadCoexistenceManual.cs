@@ -15,15 +15,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-namespace Condominiums.Api.Options;
+namespace Condominiums.Api.UploadFiles.CoexistenceManual;
 
-public class GeneralSettingsOptions
+public interface IUploadCoexistenceManual : IUploadFile
 {
-    public const string ConfigurationSection = "GeneralSettings";
-    public string CondominiumName { get; set; }
-    public string CondominiumDescription { get; set; }
-    public string CondominiumAddress { get; set; }
-    public string CondominiumPhone { get; set; }
-    public string CondominiumCoexistenceManualPath { get; set; }
-    public string HomePageBackgroundImagePath { get; set; }
+    // This interface can be extended in the future with coexistence manual-specific upload methods if needed.
+    // Currently, it inherits from IUploadFile to utilize the base file upload functionality.
 }

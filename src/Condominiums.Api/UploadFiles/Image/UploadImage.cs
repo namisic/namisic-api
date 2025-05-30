@@ -15,15 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-namespace Condominiums.Api.Options;
+using Condominiums.Api.Options;
+using Microsoft.Extensions.Options;
 
-public class GeneralSettingsOptions
+namespace Condominiums.Api.UploadFiles.Image;
+
+/// <summary>
+/// Uploads images to the server.
+/// </summary>
+/// <param name="filesOptions">Files options configured.</param>
+public class UploadImage(IOptions<FilesOptions> filesOptions) : UploadFileBase(filesOptions.Value.ImagesPath, s_validImageExtensions, filesOptions.Value.MaxSize), IUploadImage
 {
-    public const string ConfigurationSection = "GeneralSettings";
-    public string CondominiumName { get; set; }
-    public string CondominiumDescription { get; set; }
-    public string CondominiumAddress { get; set; }
-    public string CondominiumPhone { get; set; }
-    public string CondominiumCoexistenceManualPath { get; set; }
-    public string HomePageBackgroundImagePath { get; set; }
+    /// <summary>
+    /// Valid image file extensions supported by the upload service.
+    /// </summary>
+    private static readonly IReadOnlyCollection<string> s_validImageExtensions =
+    [
+        ".jpg", ".jpeg", ".png", ".webp"
+    ];
 }
