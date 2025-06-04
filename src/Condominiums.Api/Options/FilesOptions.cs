@@ -23,4 +23,5 @@ public class FilesOptions
     public string ImagesPath { get; set; }
     public string DocumentsPath { get; set; }
     public short MaxSize { get; set; }
+    public string StorageUri { get; set; }
 }

@@ -27,7 +27,7 @@ namespace Condominiums.Api.UploadFiles;
 /// <param name="MaxSize">Max file size allowed to save in MB.</param>
 public abstract class UploadFileBase(string BasePath, IReadOnlyCollection<string> ValidExtensions, short MaxSize) : IUploadFile
 {
-    public async Task<Result<string>> UploadAsync(FileStream fileStream, string extension, CancellationToken cancellationToken = default)
+    public async Task<Result<string>> UploadAsync(Stream fileStream, string extension, CancellationToken cancellationToken = default)
     {
         int maxSizeInBytes = MaxSize * 1024 * 1024; // Convert max size from MB to bytes
 

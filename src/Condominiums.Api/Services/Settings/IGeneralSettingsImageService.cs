@@ -17,19 +17,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Condominiums.Api.Base;
 
-namespace Condominiums.Api.UploadFiles;
+namespace Condominiums.Api.Services.Settings;
 
-/// <summary>
-/// Defines the method that allows to upload a file.
-/// </summary>
-public interface IUploadFile
+public interface IGeneralSettingsImageService
 {
     /// <summary>
-    /// Uploads a file asynchronously.
+    /// Uploads the home background image and updates the general settings with the public URI.
     /// </summary>
-    /// <param name="fileStream">The file stream to upload.</param>
-    /// <param name="extension">The file extension, including the dot (e.g., ".jpg").</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous operation, containing the result of the upload operation.</returns>
-    Task<Result<string>> UploadAsync(Stream fileStream, string extension, CancellationToken cancellationToken = default);
+    /// <param name="fileStream">The image file stream.</param>
+    /// <param name="extension">The file extension (e.g., ".jpg").</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Result with the public URI of the uploaded image.</returns>
+    Task<Result<string>> UploadHomeBackgroundImageAsync(Stream fileStream, string extension, CancellationToken cancellationToken = default);
 }
