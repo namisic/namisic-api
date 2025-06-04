@@ -11,7 +11,7 @@ Primero debes tener instalado Docker Compose en la máquina. Sigue [la guía de 
 Se debe crear una red de Docker para permitir la comunicación entre los contenedores:
 
 ```
-docker network create -d bridge namisic_local_net
+docker network create -d bridge --attachable namisic_local_net
 ```
 
 ## Crear base de datos
