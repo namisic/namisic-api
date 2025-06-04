@@ -38,9 +38,17 @@ services:
       ClientId: namisic
       RoleNames__Administrator: namisic/representante_legal
       RoleNames__SecurityGuard: namisic/empleado_seguridad
+      GeneralSettings__CondominiumName: Unidad Residencial Local
+      GeneralSettings__CondominiumDescription: Aprendiendo a vivir en comunidad
+      GeneralSettings__CondominiumAddress: localhost
+      GeneralSettings__CondominiumPhone: 0123456789
+      Files__ImagesPath: /uploads/images/
+      Files__DocumentsPath: /uploads/documents/
+      Files__MaxSize: 5
+      Files__StorageUri: https://localhost:5000
     ports:
       - 5000:80
     networks:
       - namisic_local_net
     volumes:
-      - ./src:/app
+      - ./uploads:/uploads:rw
