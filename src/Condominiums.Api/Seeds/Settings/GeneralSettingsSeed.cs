@@ -49,9 +49,10 @@ public class GeneralSettingsSeed : IGeneralSettingsSeed
 
         if (generalSettingsDb == null)
         {
-            _logger.LogInformation("Initializing '{name}' settings", _generalSettingsStore.Name);
+            _logger.LogInformation("Seeding '{name}' settings.", _generalSettingsStore.Name);
             GeneralSettingsDto generalSettings = _mapper.Map<GeneralSettingsDto>(_generalSettingsOptions);
             await _generalSettingsStore.InsertAsync(generalSettings);
+            _logger.LogInformation("'{name}' settings seeded.", _generalSettingsStore.Name);
         }
     }
 }

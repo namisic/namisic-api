@@ -49,7 +49,29 @@ public abstract class BaseSettingsStore<TSettings> : ISettingsStore<TSettings>
         {
             if (dbSettings.Value.TryGetValue(property.Name, out BsonValue value))
             {
-                property.SetValue(settings, value.ToString());
+                if (value.IsBsonNull)
+                {
+                    property.SetValue(settings, null);
+                } else if (value.IsBoolean)
+                {
+                    property.SetValue(settings, value.AsBoolean);
+                }
+                else if (value.IsInt32)
+                {
+                    property.SetValue(settings, value.AsInt32);
+                }
+                else if (value.IsDouble)
+                {
+                    property.SetValue(settings, value.AsDouble);
+                }
+                else if (value.IsString)
+                {
+                    property.SetValue(settings, value.AsString);
+                }
+                else if (value.IsBsonDateTime)
+                {
+                    property.SetValue(settings, value.ToUniversalTime());
+                }
             }
         }
 
@@ -58,9 +80,9 @@ public abstract class BaseSettingsStore<TSettings> : ISettingsStore<TSettings>
 
     public async Task InsertAsync(TSettings settings)
     {
-        Dictionary<string, string> values = settings.GetType()
+        Dictionary<string, object?> values = settings.GetType()
             .GetProperties()
-            .ToDictionary(p => p.Name, p => p.GetValue(settings)!.ToString()!);
+            .ToDictionary(p => p.Name, p => p.GetValue(settings));
         var valuesBsonDocument = new BsonDocument(values);
         var newSettings = new Entities.Settings(Name, valuesBsonDocument);
 

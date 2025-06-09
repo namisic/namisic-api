@@ -33,7 +33,7 @@ public class Farmer : IFarmer
 
     public async Task PlantAsync()
     {
-        _logger.LogTrace("Planting seeds");
+        _logger.LogTrace("Seeding started.");
 
         try
         {
@@ -41,7 +41,9 @@ public class Farmer : IFarmer
         }
         catch (Exception ex)
         {
-            _logger.LogError("Error plantando semillas: {error}", [new { error = ex.Message }]);
+            _logger.LogError("Unexpected error while seeding: {error}{ln}Details: {details}", ex.Message, Environment.NewLine, ex.StackTrace);
         }
+
+        _logger.LogTrace("Seeding finished.");
     }
 }
